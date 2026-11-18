@@ -87,7 +87,7 @@ const KEPT: Record<string, string[]> = {
     "transcript.waitingForBrain.code",
     "transcript.waitingForBrain.source",
     // The stages of a run's profile: named by the code that times them, counted by the work analytics.
-    "transcript.profiles.stages.stage",
+    "profiles.stages.stage",
   ],
   agent_run_steps: [
     "data.name",
@@ -156,6 +156,12 @@ const PLACES: [what: string, table: string, value: string, where?: string][] = [
   ["a notification's words", "notifications", "latest::text"],
   ["what a member wrote to ask for help", "support_requests", "text"],
   ["what the thing they reported says", "support_requests", "about"],
+  [
+    "the operator's reply to them, in the job of its email",
+    "outbox",
+    "payload->'template'->>'text'",
+    "payload->'template'->>'kind' = 'support_reply'",
+  ],
 ];
 
 const TABLES = `
@@ -238,7 +244,12 @@ beforeAll(async () => {
   });
   // A server that provisions computers lists the workspaces waiting for one: the only read its setting changes.
   const config = { ...t.config, MACHINE_PROVISIONING: "external" as const };
-  const app = createOperatorApp({ db: t.db, config, version: "test", log: createLogger("error") }, TOKEN, READ, REVEAL);
+  const app = createOperatorApp(
+    { db: t.db, config, version: "test", log: createLogger("error"), emails: true },
+    TOKEN,
+    READ,
+    REVEAL,
+  );
   as = (token) => async (path, json) =>
     app.request(`/api/operator/v1${path}`, {
       headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
@@ -857,6 +868,15 @@ beforeAll(async () => {
   await db
     .insert(schema.machineProvisioning)
     .values({ orgId: waiting?.id ?? "", state: "preparing", step: "installing", stage: "apps", since: new Date() });
+
+  // The operator answered that request in its own words: until the email goes out, its job holds them.
+  const replied = await as(REVEAL)(`/reveal/orgs/${orgId}/replies`, {
+    requestId: confidential.requestId,
+    text: "canary reply words",
+    operator: "someone",
+    assistedByAi: true,
+  });
+  expect(replied.status).toBe(200);
 
   // The secrets the server made itself, as it stored them.
   for (const s of await db.select({ token: schema.sessions.token }).from(schema.sessions)) hidden.push(s.token);

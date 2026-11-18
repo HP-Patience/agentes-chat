@@ -3647,7 +3647,13 @@ export function createFakeHttpApi(state: FakeState): Omit<HttpApi, FakedParts> {
     },
     connectors: {
       catalog: async () => CATALOG,
-      list: async () => structuredClone(state.connections),
+      // As the backend: the team's and the viewer's own; everyone's with `others`.
+      list: async (_orgId, options) =>
+        structuredClone(
+          state.connections.filter(
+            (c) => options?.others || !c.ownerUserId || c.ownerUserId === (state.me?.user.id ?? null),
+          ),
+        ),
       connectWithKey: async (orgId, input) => {
         log("connectors.connectWithKey", orgId, { ...input, apiKey: "[redacted]" });
         const conn: Connection = {
@@ -3660,6 +3666,7 @@ export function createFakeHttpApi(state: FakeState): Omit<HttpApi, FakedParts> {
           tokenExpiresAt: null,
           createdAt: new Date().toISOString(),
           revokedAt: null,
+          ...(input.personal ? { ownerUserId: state.me?.user.id ?? null } : {}),
         };
         state.connections.push(conn);
         return conn;
@@ -3678,6 +3685,17 @@ export function createFakeHttpApi(state: FakeState): Omit<HttpApi, FakedParts> {
         const conn = state.connections.find((c) => c.id === connectionId);
         if (!conn) throw new ApiError(404, "not_found", "Connection not found");
         conn.label = label;
+        return structuredClone(conn);
+      },
+      takeOffAgent: async (orgId, connectionId, agentId) => {
+        log("connectors.takeOffAgent", orgId, connectionId, agentId);
+        state.scopes[agentId] = (state.scopes[agentId] ?? []).filter((g) => g.connectionId !== connectionId);
+      },
+      moveToTeam: async (orgId, connectionId) => {
+        log("connectors.moveToTeam", orgId, connectionId);
+        const conn = state.connections.find((c) => c.id === connectionId);
+        if (!conn) throw new ApiError(404, "not_found", "Connection not found");
+        conn.ownerUserId = null;
         return structuredClone(conn);
       },
       disconnect: async (orgId, connectionId) => {
@@ -4168,15 +4186,23 @@ export function createFakeApi(state: FakeState = seedState(), options: { seed?: 
     (orgId, id) => machines.client.remove(orgId, id),
   );
   const agentIds = async (orgId: string) => (await http.agents.list(orgId)).map((a) => a.id);
+  const ownAgentIds = async (orgId: string) =>
+    (await http.agents.list(orgId)).filter((a) => a.ownerUserId === state.me?.user.id).map((a) => a.id);
   const customConnectors = createMockCustomConnectors(
     ctx,
     (method, ...args) => state.calls.push({ method, args }),
-    async (orgId, serverId) => access.connected(serverId, await agentIds(orgId)),
+    async (orgId, serverId) => {
+      // A personal account goes on for its person's own agents, a team one for every agent.
+      const server = (await customConnectors.list(orgId)).find((x) => x.id === serverId);
+      access.connected(serverId, server?.ownerUserId ? await ownAgentIds(orgId) : await agentIds(orgId));
+    },
+    () => state.me?.user.id ?? null,
   );
   const access = createFakeAccess(
-    (orgId) => http.connectors.list(orgId),
+    (orgId, options) => http.connectors.list(orgId, options),
     (method, ...args) => state.calls.push({ method, args }),
-    (orgId) => customConnectors.list(orgId),
+    (orgId, options) => customConnectors.list(orgId, options),
+    () => state.me?.user.id ?? null,
   );
   const mail = createFakeMail(
     (method, ...args) => state.calls.push({ method, args }),
@@ -4221,8 +4247,20 @@ export function createFakeApi(state: FakeState = seedState(), options: { seed?: 
       },
     ),
     access,
+    // Someone else's personal server comes with the agents that hold it, as the backend lists it with `others`.
+    customConnectors: {
+      ...customConnectors,
+      list: async (orgId, options) =>
+        (await customConnectors.list(orgId, options)).map((x) =>
+          x.ownerUserId && x.ownerUserId !== state.me?.user.id ? { ...x, agentIds: access.holders(x.id) } : x,
+        ),
+    },
     connectors: {
       ...http.connectors,
+      takeOffAgent: async (orgId, connectionId, agentId) => {
+        await http.connectors.takeOffAgent(orgId, connectionId, agentId);
+        access.takeOff(connectionId, agentId);
+      },
       // Any kind: a server's account or a catalog connection. Names are unique in the workspace.
       rename: async (orgId, connectionId, label) => {
         const name = label.trim();
@@ -4248,9 +4286,11 @@ export function createFakeApi(state: FakeState = seedState(), options: { seed?: 
       },
       // A first connection of a connector is every agent's (a new key for it keeps their grants).
       connectWithKey: async (orgId, input) => {
-        const first = !(await http.connectors.list(orgId)).some((c) => c.connector === input.connector);
+        const first = !(await http.connectors.list(orgId)).some(
+          (c) => c.connector === input.connector && !c.ownerUserId === !input.personal,
+        );
         const connection = await http.connectors.connectWithKey(orgId, input);
-        if (first) access.connected(connection.id, await agentIds(orgId));
+        if (first) access.connected(connection.id, input.personal ? await ownAgentIds(orgId) : await agentIds(orgId));
         return connection;
       },
     },
@@ -4431,7 +4471,6 @@ export function createFakeApi(state: FakeState = seedState(), options: { seed?: 
     ),
     artifacts,
     ...createMockPlanning(ctx, (method, ...args) => state.calls.push({ method, args })),
-    customConnectors,
     mail: mail.client,
     databases: databases.client,
     dashboards: dashboards.client,

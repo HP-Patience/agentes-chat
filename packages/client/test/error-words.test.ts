@@ -463,6 +463,8 @@ const PLAIN_LINE = new Set([
   "claude_auth.invalid",
   "claude_auth.unknown_org",
   "connector.key_too_short",
+  // A one-click connection is never offered "Passar para a equipe" (`connectionActs`), so only an API client meets this.
+  "connector.move_one_click",
   "connector.oauth_only",
   "connector.sensitive_tool",
   "context.changes_permissions",
@@ -521,10 +523,14 @@ const PLAIN_LINE = new Set([
   "request_expired",
   "request_unknown",
   "request_used",
-  // Only the operator API's reveal door refuses with these (ADR 0056): no person in the apps meets them.
+  // Only the operator API's reveal door and its replies refuse with these (ADR 0056): no person in the apps meets them.
+  "reveal.limit_day",
   "reveal.limit_minute",
+  "reveal.limit_request",
   "reveal.limit_workspace",
+  "reveal.no_email",
   "reveal.no_error",
+  "reveal.request_old",
   "right_hand.missing",
   "right_hand_approvals.budget",
   // "Quem pode" sends only the rows and steps the cargo page draws (`areaRows`, `rowMax`): another is a client fault.

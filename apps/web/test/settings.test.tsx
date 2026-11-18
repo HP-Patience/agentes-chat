@@ -689,6 +689,8 @@ describe("Configurações do workspace", () => {
     expect(document.body.textContent).not.toContain("Acme builds rockets");
     cleanup();
     await go(state, "settings/connectors");
+    // Their own connections only: the team's side has no Adicionar for them.
+    await click(screen().getByRole("radio", { name: /Equipe/ }));
     expect(screen().queryByRole("button", { name: "Adicionar conector" })).toBeNull();
     cleanup();
     // IA e uso: the plans in percentages, never the workspace's keys, money or report.

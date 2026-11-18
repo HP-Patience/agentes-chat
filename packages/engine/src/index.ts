@@ -79,6 +79,7 @@ export * from "./connectors/listing";
 export * from "./connectors/mcp";
 export * from "./connectors/oauth-mcp";
 export * from "./connectors/oauth-return";
+export * from "./connectors/personal";
 export * from "./connectors/pins";
 export * from "./connectors/presets";
 export * from "./connectors/request-headers";
@@ -242,6 +243,7 @@ export {
 export * from "./operator-lookups";
 export * from "./operator-machines";
 export * from "./operator-people";
+export * from "./operator-reply";
 export * from "./operator-reveal";
 export * from "./operator-review";
 export * from "./operator-runs";

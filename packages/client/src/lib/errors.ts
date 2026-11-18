@@ -571,6 +571,7 @@ const KNOWN = {
   "org.create_refused": "errors.said.createRefused",
   "reminder.no_agent": "errors.said.noAgentToRemind",
   "routine.connector_agent_cannot_read": "errors.said.agentCantRead",
+  "routine.connector_not_yours": "errors.said.connectionNotYours",
   "routine.mail_agent_cannot_read": "errors.said.agentCantRead",
   "schedule.never": "errors.said.neverHappens",
   sole_owner: "errors.said.soleOwner",

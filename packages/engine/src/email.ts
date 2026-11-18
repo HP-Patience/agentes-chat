@@ -38,7 +38,7 @@ import {
   type Scene,
   type Text,
 } from "./email/layout";
-import { wordsFor } from "./email/words";
+import { type Words, wordsFor } from "./email/words";
 import { dayAndTime } from "./format";
 import { adminIds } from "./gateway";
 import { publicHostAddress, type ResolveHost, resolveHostDns } from "./net-guard";
@@ -354,6 +354,21 @@ export type EmailTemplate =
       personal?: true;
     }
   /**
+   * The answer of whoever runs the server to a member's support request (ADR 0056), to the address of their account:
+   * one of our own sentences (`reply`), or the operator's words (`text`), which are another party's and print inert,
+   * line by line. With neither, the words were sent already (`forgetReplyWords`). `support`: where to answer back
+   * (`SUPPORT_EMAIL`), or nowhere. `url`: the server's own address, for the pictures.
+   */
+  | {
+      kind: "support_reply";
+      locale: EmailLocale;
+      reply?: keyof Words["supportReply"]["answers"];
+      text?: string;
+      assistedByAi: boolean;
+      support: string | null;
+      url: string;
+    }
+  /**
    * The daily stall-and-noise report to the people who run the server (`OPS_REPORT_EMAIL`, `autonomy-report.ts`):
    * each count of the UTC `day` against its daily average over the 7 days before, and the workspaces with the most.
    * Workspace names and counts only. `url`: the server's own address, for the pictures.
@@ -482,6 +497,8 @@ const JOIN_NAME_SHOWN = 60;
 const OUTSIDE_OF_SHOWN = 80;
 /** An admin's reason for denying a request to join, as long as it is kept. */
 const JOIN_REASON_SHOWN = 300;
+/** The operator's own words in a reply to a support request, shown whole: the route takes no more. */
+export const REPLY_TEXT_MAX = 2000;
 
 /**
  * The template's stamp for a personal workspace (ADR 0159), spread into it where it is queued: the mode it had then
@@ -1096,6 +1113,28 @@ function docOf(t: EmailTemplate, sender: string | null): EmailDoc {
         c.why,
       );
     }
+    case "support_reply": {
+      const c = w.supportReply;
+      // A line break ends a paragraph, as it was written: each line is inert on its own.
+      const answer = t.reply
+        ? [c.answers[t.reply]]
+        : (t.text ?? "")
+            .split(/[\r\n\u2028\u2029]+/)
+            .map((line) => inertText(line, REPLY_TEXT_MAX))
+            .filter(Boolean);
+      return doc(
+        c.subject,
+        c.preheader,
+        c.headline,
+        [
+          ...answer.map((p): Block => ({ p })),
+          { small: c.from(sender) },
+          ...(t.assistedByAi ? [{ small: c.ai }] : []),
+          ...(t.support ? [{ small: c.reply(t.support) }] : []),
+        ],
+        c.why,
+      );
+    }
   }
 }
 
@@ -1255,7 +1294,10 @@ export async function sendPlanWaitingEmail(db: Database, publicUrl: string, orgI
 export async function sendQueuedEmail(sender: EmailSender, payload: Record<string, unknown>, art?: EmailArt) {
   const to = Array.isArray(payload.to) ? payload.to.map(String) : [];
   if (to.length === 0) throw new PermanentJobError("email without recipients");
-  const { subject, html, text, inline } = renderEmail(payload.template as EmailTemplate, art);
+  const template = payload.template as EmailTemplate;
+  // A reply whose words are gone was sent, or given up: its job run again (a lease lost after the send) sends nothing.
+  if (template.kind === "support_reply" && !template.reply && template.text === undefined) return;
+  const { subject, html, text, inline } = renderEmail(template, art);
   await sender
     .send({
       subject,
@@ -1264,7 +1306,7 @@ export async function sendQueuedEmail(sender: EmailSender, payload: Record<strin
       ...(inline.length > 0 ? { inline } : {}),
       to,
       idempotencyKey: String(payload.key),
-      tags: [{ name: "kind", value: (payload.template as EmailTemplate).kind }],
+      tags: [{ name: "kind", value: template.kind }],
     })
     .catch(rethrowEmailError);
 }

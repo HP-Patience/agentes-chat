@@ -2502,11 +2502,12 @@ export const useCatalog = () => {
   return useQuery({ queryKey: keys.catalog, queryFn: () => api.connectors.catalog(), staleTime: 10 * 60_000 });
 };
 
-export const useConnections = (orgId: string, enabled = true) => {
+/** `others`: also everyone else's personal ones (who manages connectors gets them, as read-only rows). */
+export const useConnections = (orgId: string, enabled = true, { others = false } = {}) => {
   const api = useApi();
   return useQuery({
-    queryKey: keys.connections(orgId),
-    queryFn: () => api.connectors.list(orgId),
+    queryKey: others ? [...keys.connections(orgId), "others"] : keys.connections(orgId),
+    queryFn: () => api.connectors.list(orgId, { others }),
     staleTime: 30_000,
     enabled,
   });
@@ -2516,7 +2517,7 @@ export function useConnectWithKey(orgId: string) {
   const api = useApi();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: { connector: string; apiKey: string; label?: string }) =>
+    mutationFn: (input: { connector: string; apiKey: string; label?: string; personal?: boolean }) =>
       api.connectors.connectWithKey(orgId, input),
     // A new connection is every agent's: their access trees change too, and so do the repositories GitHub reaches.
     onSuccess: () =>
@@ -2531,8 +2532,8 @@ export function useConnectWithKey(orgId: string) {
 export function useStartOAuth(orgId: string) {
   const api = useApi();
   return useMutation({
-    mutationFn: ({ connector, returnTo }: { connector: string; returnTo: string }) =>
-      api.connectors.startOAuth(orgId, connector, { returnTo }),
+    mutationFn: ({ connector, returnTo, personal }: { connector: string; returnTo: string; personal?: boolean }) =>
+      api.connectors.startOAuth(orgId, connector, { returnTo, ...(personal ? { personal } : {}) }),
   });
 }
 
@@ -2552,6 +2553,37 @@ export function useRenameConnection(orgId: string) {
         qc.invalidateQueries({ queryKey: keys.access(orgId) }),
       ]),
     meta: { silent: true },
+  });
+}
+
+/** "Tirar de um agente": the agent loses every grant on the connection; its access tree and the lists change. */
+export function useTakeConnectionOffAgent(orgId: string) {
+  const api = useApi();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ connectionId, agentId }: { connectionId: string; agentId: string }) =>
+      api.connectors.takeOffAgent(orgId, connectionId, agentId),
+    onSuccess: () =>
+      Promise.all([
+        qc.invalidateQueries({ queryKey: keys.access(orgId) }),
+        qc.invalidateQueries({ queryKey: keys.connections(orgId) }),
+        qc.invalidateQueries({ queryKey: keys.customServers(orgId) }),
+      ]),
+  });
+}
+
+/** Moves the person's own connection to the team: it leaves Pessoal for Equipe, and every member sees it. */
+export function useMoveConnectionToTeam(orgId: string) {
+  const api = useApi();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.connectors.moveToTeam(orgId, id),
+    onSuccess: () =>
+      Promise.all([
+        qc.invalidateQueries({ queryKey: keys.connections(orgId) }),
+        qc.invalidateQueries({ queryKey: keys.customServers(orgId) }),
+        qc.invalidateQueries({ queryKey: keys.access(orgId) }),
+      ]),
   });
 }
 
@@ -2734,11 +2766,11 @@ export const useMailProviders = (orgId: string, enabled = true) => {
 };
 
 /** The organization's mailboxes (no passwords), with the agents that use each. */
-export const useMailAccounts = (orgId: string, enabled = true) => {
+export const useMailAccounts = (orgId: string, enabled = true, { others = false } = {}) => {
   const api = useApi();
   return useQuery({
-    queryKey: keys.mailAccounts(orgId),
-    queryFn: () => api.mail.accounts(orgId),
+    queryKey: others ? [...keys.mailAccounts(orgId), "others"] : keys.mailAccounts(orgId),
+    queryFn: () => api.mail.accounts(orgId, { others }),
     enabled,
     staleTime: 30_000,
     retry: false,
@@ -4140,9 +4172,14 @@ export function useCorrectMessage(orgId: string) {
 
 // ── Invites, custom MCP ─────────────────────────────────────────────────────
 
-export const useCustomServers = (orgId: string, enabled = true) => {
+/** `others`: also everyone else's personal ones (who manages connectors gets them, as read-only rows). */
+export const useCustomServers = (orgId: string, enabled = true, { others = false } = {}) => {
   const api = useApi();
-  return useQuery({ queryKey: keys.customServers(orgId), queryFn: () => api.customConnectors.list(orgId), enabled });
+  return useQuery({
+    queryKey: others ? [...keys.customServers(orgId), "others"] : keys.customServers(orgId),
+    queryFn: () => api.customConnectors.list(orgId, { others }),
+    enabled,
+  });
 };
 
 export function useCustomServerAction(orgId: string) {
@@ -5191,11 +5228,12 @@ export function useFeedbackOffer(
 // ── Agent access (tool tree) ─────────────────────────────────────────────────
 
 /** The agent's tool tree. `retry: false`: a 404 means the backend doesn't have it yet. */
-export const useAgentAccess = (orgId: string, agentId: string, enabled = true) => {
+/** `others`: someone else's personal connection the agent holds comes too, with no scopes (it can only go off). */
+export const useAgentAccess = (orgId: string, agentId: string, enabled = true, { others = false } = {}) => {
   const api = useApi();
   return useQuery({
-    queryKey: keys.agentAccess(orgId, agentId),
-    queryFn: () => api.access.get(orgId, agentId),
+    queryKey: others ? [...keys.agentAccess(orgId, agentId), "others"] : keys.agentAccess(orgId, agentId),
+    queryFn: () => api.access.get(orgId, agentId, { others }),
     enabled,
     retry: false,
   });

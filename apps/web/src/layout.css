@@ -5232,6 +5232,56 @@ html:not([data-pointer]) .catalog-tile:focus-visible {
   min-width: 0;
   white-space: nowrap;
 }
+/* Someone else's personal connection on an agent: whose it is, on its own line under its name. */
+.level-row__owner {
+  gap: var(--space-1);
+}
+/* Desligar ends on the list's edge, as the level controls do, at every width. */
+.level-row > .ac-mediarow__end:not(.ac-mediarow__end--wrap) {
+  grid-area: 1 / 4;
+}
+.connected-row__meta {
+  gap: var(--space-1);
+}
+.connected-others {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.connected-others > button {
+  align-self: flex-start;
+}
+/* Pessoal's note under Equipe | Pessoal, in the settings panel's own stack: no browser margins of its own. */
+.connected-note {
+  margin: 0;
+}
+/* "Pessoal de <name>": one run of words that wraps, the name isolated in its own direction (`bdi`). */
+.owner-of {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* Tirar de um agente: one agent per line, its face, its name cut at the edge, Tirar at the end. */
+.connected-takeoff {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.connected-takeoff__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-h-md);
+}
+.connected-takeoff__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 /* Cofre › a connection's buttons, under its details (its row stays open: it holds a link and what to fix). */
 .connected-row__actions {
   display: flex;
@@ -5348,6 +5398,10 @@ html:not([data-pointer]) .cflow__more summary:focus-visible {
   flex-direction: column;
   gap: var(--form-gap);
   margin-top: var(--space-3);
+}
+/* After "Para quem" the dialog's own gap is the space: a field ends on its own line, not on running text. */
+.ac-field + .cflow__key {
+  margin-top: 0;
 }
 /* A server by address's request headers: what they are for, the saved names, a name and a value per row, one more. */
 .cflow__headers {

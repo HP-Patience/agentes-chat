@@ -530,7 +530,8 @@ async function workOf(
   for (const st of steps) {
     const name = st.kind === "tool_call" && typeof st.data.name === "string" ? st.data.name : "";
     const input = st.data.input as Record<string, unknown> | undefined;
-    if (!name) continue;
+    // A call in a person's own connection is theirs alone, and one task view goes to every reader of the task.
+    if (!name || st.data.personal === true) continue;
     const answer = name === PERMISSION_TOOL ? answers.get(st.data.toolUseId) : undefined;
     if (promptPoll(name, input)) {
       for (const asked of answer?.behavior ? (waiting.get(String(input?.request_id)) ?? []) : []) {

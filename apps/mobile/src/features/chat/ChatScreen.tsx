@@ -217,7 +217,7 @@ import { ChannelPicker } from "./ChannelPicker";
 import { ChannelWelcome } from "./ChannelWelcome";
 import { ChatPeek, usePullPastEnd } from "./ChatPeek";
 import { ChatSkeleton } from "./ChatSkeleton";
-import { ChatWallpaper, WallpaperBand, WallpaperUnder } from "./ChatWallpaper";
+import { ChatWallpaper, DOCK_FADE, WallpaperBand, WallpaperUnder } from "./ChatWallpaper";
 import { type OpenedMessages, OpenedMessagesContext } from "./ClippedMessage";
 import { ConversationSwitcher } from "./ConversationSwitcher";
 import { takeComposerRequest, useComposerRequest } from "./composer-request";
@@ -2584,8 +2584,9 @@ function Chat({
   // opens, only `OPEN_DRAW_DISTANCE`: opening at its end, the list takes its whole reach at once, and two screens of
   // rows were drawn before the first showed.
   const { height: windowHeight } = useWindowDimensions();
-  // How far down the fade under the header stays solid: the status bar's share of it.
-  const topFadeSolid = headerHeight > 0 ? Math.min(1, insets.top / (headerHeight + 28)) : 0;
+  // How far down the fade under the header stays solid: through the status bar and the bar (a message scrolled up
+  // showed through the bar's pill and between its buttons), fading out in the 28 points under it.
+  const topFadeSolid = headerHeight > 0 ? Math.min(1, headerHeight / (headerHeight + 28)) : 0;
   const lift = Math.max(0, bottomPad - KEYBOARD_GAP);
   const showList = !loading && !(rows.length === 0 && runs.length === 0);
   // The conversation starts below the clear bar by our own padding, on both platforms (the pinned card, when there
@@ -3135,8 +3136,8 @@ function Chat({
             ) : (
               <LinearGradient
                 pointerEvents="none"
-                colors={[c.bg, c.bg, withOpacity(c.bg, 0.86), withOpacity(c.bg, 0)]}
-                locations={[0, topFadeSolid, Math.max(0.62, topFadeSolid), 1]}
+                colors={[c.bg, c.bg, withOpacity(c.bg, 0)]}
+                locations={[0, topFadeSolid, 1]}
                 style={[styles.topFade, { height: headerHeight + 28 }]}
               />
             )
@@ -3194,12 +3195,11 @@ function Chat({
                     lift={lift}
                   />
                 ) : (
-                  <LinearGradient
-                    pointerEvents="none"
-                    colors={[withOpacity(c.bg, 0), withOpacity(c.bg, 0.9), c.bg]}
-                    locations={[0, 0.3, 1]}
-                    style={StyleSheet.absoluteFill}
-                  />
+                  // A short fade at the box's top (`DOCK_FADE`), then the page: its first line never sits over words.
+                  <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+                    <LinearGradient colors={[withOpacity(c.bg, 0), c.bg]} style={styles.dockFade} />
+                    <View style={[styles.grow, { backgroundColor: c.bg }]} />
+                  </View>
                 )}
                 <Connection status={realtime} />
                 {banner && !org?.deletion ? <NoAiBanner banner={banner} /> : null}
@@ -4021,6 +4021,7 @@ const ChannelPill = memo(function ChannelPill({
 const styles = StyleSheet.create({
   // The counted buttons side by side, first in the bar's group (`barLead`).
   barLead: { flexDirection: "row", alignItems: "center" },
+  dockFade: { height: DOCK_FADE },
   topFade: { position: "absolute", top: 0, left: 0, right: 0 },
   // Under the agent's words, like a card on its message.
   browserRow: { paddingRight: 16 },

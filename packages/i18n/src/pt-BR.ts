@@ -13322,6 +13322,43 @@ export const ptBR = {
       list: "Servidores MCP conectados",
       none: "Os servidores MCP que você conectar pelo endereço aparecem aqui.",
     },
+    /** Connections split as the Vault splits its items: the team's and each person's (ADR 0099 addendum). */
+    personal: {
+      note: "Só você abre estas conexões. Seus agentes só usam quando você pede.",
+      /** Over one connection's own screen on the phone. */
+      noteOne: "Só você abre esta conexão. Seus agentes só usam quando você pede.",
+      emptyTitle: "Conecte suas próprias contas",
+      emptyText:
+        "Só você abre suas conexões, e seus agentes só usam quando você pede. Caixas de email seguem a regra delas.",
+      noApps: "Os serviços que você conectar só para você aparecem aqui.",
+      /** Over the person's own mailboxes on Pessoal: their rule (ADR 0038), not the connections' one. */
+      mailTitle: "Suas caixas de email",
+      mailNote:
+        "Os agentes que você deixou usam suas caixas como você permitiu, também para quem fala direto com eles. Quando outra pessoa pede algo que precisa de aprovação, quem aprova é você.",
+      others: "Pessoais de outras pessoas",
+      of: "Pessoal de {{name}}",
+      seeAll: "Ver todas as {{count}}",
+      forWhom: "Para quem",
+      teamLocked: "Só quem gerencia conectores adiciona os da equipe.",
+      mailLocked: "Uma caixa de email é sempre de quem a conecta.",
+      done: "Seus agentes só usam quando você pede.",
+      worksWhenAsked: "Só funciona quando você pede.",
+      remove: "Remover",
+      removeName: "Remover {{name}}",
+      removeTitle: "Remover {{name}}?",
+      takeOff: "Tirar de um agente",
+      takeOffTitle: "Tirar {{name}} de um agente",
+      takeOffName: "Tirar {{name}} de {{agent}}",
+      takeOffOne: "Tirar",
+      takenOff: "{{agent}} não usa mais {{name}}.",
+      turnOff: "Desligar",
+      turnOffName: "Desligar {{name}} neste agente",
+      moveToTeam: "Passar para a equipe",
+      moveTitle: "Passar {{name}} para a equipe?",
+      moveText:
+        "Todos do workspace passam a ver. Quem gerencia agentes escolhe quais agentes usam, e o dono de um agente pode desligar no seu. Um agente que usa todos os apps conectados passa a usar na hora.",
+      moved: "{{name}} agora é da equipe.",
+    },
     addTitle: "Adicionar conector",
     catalogText: "Conecte uma vez para a {{org}}. Depois escolha o que cada agente pode usar.",
     catalog: "Conectores disponíveis",
@@ -15292,6 +15329,8 @@ export const ptBR = {
       createRefused: "Você não pode criar um workspace agora.",
       noAgentToRemind: "Nenhum agente desta conversa pode lembrar você.",
       agentCantRead: "Deixe o agente ler isto primeiro, nos acessos dele.",
+      /** A routine on someone else's own connection: only that person's own routine waits on its events. */
+      connectionNotYours: "Esta conexão é pessoal de outra pessoa. Só uma rotina dela pode esperar pelos eventos dela.",
       neverHappens: "Este agendamento nunca acontece.",
       soleOwner:
         "Você é a única pessoa dona de um workspace com outros membros. Passe a posse a alguém, ou apague o workspace, antes.",
@@ -16980,6 +17019,10 @@ export const ptBR = {
       fault: "para diagnosticar uma execução que falhou ou travou",
       ai: "com um assistente de IA",
     },
+    operatorReply: {
+      sentence: "{{who}} respondeu por e-mail",
+      request: "pedido de suporte de {{name}}",
+    },
     change: {
       mergedWithoutAsking: "Fez o merge em {{repo}} sem perguntar",
       accentChanged: "Mudou a cor de destaque do workspace",
@@ -17187,7 +17230,7 @@ export const ptBR = {
       roles: "Cada cargo soma permissões, canais e agentes.",
       vault: "Senhas, chaves e contatos dos agentes. Senhas eles nunca veem.",
       access: "O que cada agente pode usar: um nível por conector.",
-      connectors: "Serviços e servidores MCP conectados uma vez para o workspace inteiro.",
+      connectors: "Serviços e servidores MCP, conectados para a equipe ou só para você.",
       skills: "Instruções em Markdown que os agentes abrem quando precisam.",
       storage: "Onde ficam os arquivos do workspace.",
       usage: "As contas de IA do workspace, e quanto cada pessoa e agente usa.",

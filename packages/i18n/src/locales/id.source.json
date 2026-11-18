@@ -31545,6 +31545,93 @@
   "connectors.mcp.none": {
     "value": "MCP servers you connect by their address show up here."
   },
+  "connectors.personal.note": {
+    "value": "Only you open these connections. Your agents use them only when you ask."
+  },
+  "connectors.personal.noteOne": {
+    "value": "Only you open this connection. Your agents use it only when you ask."
+  },
+  "connectors.personal.emptyTitle": {
+    "value": "Connect your own accounts"
+  },
+  "connectors.personal.emptyText": {
+    "value": "Only you open your connections, and your agents use them only when you ask. Mailboxes follow their own rule."
+  },
+  "connectors.personal.noApps": {
+    "value": "Services you connect just for yourself show up here."
+  },
+  "connectors.personal.mailTitle": {
+    "value": "Your mailboxes"
+  },
+  "connectors.personal.mailNote": {
+    "value": "Agents you allowed use your mailboxes as you set, also for people who talk to them directly. When someone else asks for something that needs approval, you're the one who approves it."
+  },
+  "connectors.personal.others": {
+    "value": "Others' personal connections"
+  },
+  "connectors.personal.of": {
+    "value": "Personal to {{name}}"
+  },
+  "connectors.personal.seeAll": {
+    "value": "See all {{count}}"
+  },
+  "connectors.personal.forWhom": {
+    "value": "Who it's for"
+  },
+  "connectors.personal.teamLocked": {
+    "value": "Only people who manage connectors add the team's."
+  },
+  "connectors.personal.mailLocked": {
+    "value": "A mailbox always belongs to whoever connects it."
+  },
+  "connectors.personal.done": {
+    "value": "Your agents use it only when you ask."
+  },
+  "connectors.personal.worksWhenAsked": {
+    "value": "Works only when you ask."
+  },
+  "connectors.personal.remove": {
+    "value": "Remove"
+  },
+  "connectors.personal.removeName": {
+    "value": "Remove {{name}}"
+  },
+  "connectors.personal.removeTitle": {
+    "value": "Remove {{name}}?"
+  },
+  "connectors.personal.takeOff": {
+    "value": "Take off an agent"
+  },
+  "connectors.personal.takeOffTitle": {
+    "value": "Take {{name}} off an agent"
+  },
+  "connectors.personal.takeOffName": {
+    "value": "Take {{name}} off {{agent}}"
+  },
+  "connectors.personal.takeOffOne": {
+    "value": "Take off"
+  },
+  "connectors.personal.takenOff": {
+    "value": "{{agent}} no longer uses {{name}}."
+  },
+  "connectors.personal.turnOff": {
+    "value": "Turn off"
+  },
+  "connectors.personal.turnOffName": {
+    "value": "Turn off {{name}} for this agent"
+  },
+  "connectors.personal.moveToTeam": {
+    "value": "Move to the team"
+  },
+  "connectors.personal.moveTitle": {
+    "value": "Move {{name}} to the team?"
+  },
+  "connectors.personal.moveText": {
+    "value": "Everyone in the workspace sees it. People who manage agents choose which agents use it, and an agent's owner can turn it off on theirs. An agent that uses every connected app gets it right away."
+  },
+  "connectors.personal.moved": {
+    "value": "{{name}} now belongs to the team."
+  },
   "connectors.addTitle": {
     "value": "Add connector"
   },
@@ -37095,6 +37182,9 @@
   "errors.said.agentCantRead": {
     "value": "Let the agent read this first, in its access settings."
   },
+  "errors.said.connectionNotYours": {
+    "value": "This connection is someone else's own. Only a routine of theirs can wait on its events."
+  },
   "errors.said.neverHappens": {
     "value": "This schedule never happens."
   },
@@ -41129,6 +41219,12 @@
   "audit.operatorRead.ai": {
     "value": "with an AI assistant"
   },
+  "audit.operatorReply.sentence": {
+    "value": "{{who}} answered by email"
+  },
+  "audit.operatorReply.request": {
+    "value": "support request from {{name}}"
+  },
   "audit.change.mergedWithoutAsking": {
     "value": "Merged in {{repo}} without asking"
   },
@@ -41658,7 +41754,7 @@
     "value": "What each agent can use: one level per connector."
   },
   "settings.sectionText.connectors": {
-    "value": "Services and MCP servers connected once for the whole workspace."
+    "value": "Services and MCP servers, connected for the team or just for you."
   },
   "settings.sectionText.skills": {
     "value": "Markdown instructions agents open when they need them."

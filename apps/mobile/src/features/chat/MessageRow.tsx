@@ -112,6 +112,7 @@ import { AwayPill, BrainWait } from "../outages/WaitCard";
 import { SettingsProposals } from "../right-hand/SettingsCard";
 import { ReplyChips, TeamCard } from "../right-hand/TeamCard";
 import { TeamWeek } from "../right-hand/TeamWeekCard";
+import { type BubbleHead, BubbleHeadContext, type BubblePart, BubblePartContext } from "../shared/bubble-part";
 import { AgentFace, Face, withAgentFaces } from "../shared/Face";
 import { useColors, useOrgId, useWhen } from "../shared/hooks";
 import { agentLook } from "../shared/logic";
@@ -850,7 +851,23 @@ function RowBody({
   // A DM's bubbles name nobody (`look.names` off): a card that comes alone (a question, the browser) carries no name
   // line either, unless a tag has something to say.
   const nameLine = !grouped && !(bubbled && !look.names && !tagged);
-  const nameOrWords = Boolean(inBubble || nameLine || pinLine || reportOpened || opener || words);
+  // In bubbles, a message that is only a request (an approval, a question, a secret) is a bubble of its own: its name
+  // line goes inside the card, at its top, and its time at the card's end (`BubbleHeadContext`), not on a line of the
+  // other looks above it.
+  const askAlone =
+    bubbled &&
+    nameLine &&
+    !body &&
+    !media &&
+    !words &&
+    !voiceOf(meta) &&
+    [approvalId, question, secret].filter(Boolean).length === 1;
+  const bubbleHead = askAlone ? { who: who(true), time: when.time(m.createdAt) } : null;
+  const nameOrWords = Boolean(inBubble || (nameLine && !askAlone) || pinLine || reportOpened || opener || words);
+  // In bubbles, the cards under these words are bubbles of the same message: its fill, 3 points under it, joined
+  // (`BubblePartContext`, `BUBBLE_JOIN`).
+  const bubblePart = bubbled ? { fill: otherFill, edge: bubbleEdge } : null;
+  const partTop = bubbled && (body || media) ? BUBBLE_JOIN - rhythm.part : cardTop;
   return (
     <>
       {pair}
@@ -893,7 +910,7 @@ function RowBody({
           </View>
         ) : null}
         <View style={[styles.body, { gap: rhythm.part }]}>
-          <RowPartContext.Provider value={cardTop}>
+          <RowParts top={partTop} part={bubblePart} head={bubbleHead}>
             {nameOrWords ? (
               <View>
                 {inBubble ? (
@@ -929,7 +946,7 @@ function RowBody({
                   </>
                 ) : (
                   <>
-                    {nameLine ? who(false) : null}
+                    {nameLine && !askAlone ? who(false) : null}
                     {pinLine}
                     {reportOpened}
                     {openerPart}
@@ -986,7 +1003,7 @@ function RowBody({
             ) : null}
             {cards}
             {/* Its tools after its words, what it changed and its cards: the same place live, kept and saved. Left
-                open, they come back open (`keptOpen`). */}
+            open, they come back open (`keptOpen`). */}
             {kept ? (
               <TurnTools
                 items={opened?.lines ?? kept.items}
@@ -1008,8 +1025,8 @@ function RowBody({
               />
             ) : null}
             {/* What waits for a person's click comes last, after the words and the tools. Each card with work of its
-                own before it knows it has nothing to show (queries, the directory, a clock) is drawn only on a
-                message that carries it: under every agent's message, a scroll paid for all of them on each row. */}
+            own before it knows it has nothing to show (queries, the directory, a clock) is drawn only on a
+            message that carries it: under every agent's message, a scroll paid for all of them on each row. */}
             {isAgent && noAiCardOf(meta) ? <NoAiCard message={m} /> : null}
             {isAgent && stretchCardOf(meta) ? <StretchCard message={m} /> : null}
             {isAgent && costlyProposalOf(meta) ? <CostlyProposalCard message={m} /> : null}
@@ -1036,7 +1053,7 @@ function RowBody({
             {secret ? <SecretCard key={`${secret.id}:${secret.status}`} request={secret} /> : null}
             {missionDecision}
             {foot}
-          </RowPartContext.Provider>
+          </RowParts>
           {hintNode}
         </View>
         {popNode}
@@ -1457,6 +1474,34 @@ const BUBBLE_RUN: Record<RunPosition, { borderTopRightRadius?: number; borderBot
   mid: { borderTopRightRadius: 6, borderBottomRightRadius: 6 },
   end: { borderTopRightRadius: 6, borderBottomRightRadius: BUBBLE_CUT },
 };
+
+/**
+ * A row's parts' context: how far a card stands off what is above it (`RowPartContext`), and in bubbles that it is a
+ * bubble of this message (`BubblePartContext`) and, for a request alone, the message's name and time
+ * (`BubbleHeadContext`).
+ */
+function RowParts({
+  top,
+  part,
+  head,
+  children,
+}: {
+  top: number;
+  part: BubblePart | null;
+  head: BubbleHead | null;
+  children: ReactNode;
+}) {
+  return (
+    <RowPartContext.Provider value={top}>
+      <BubblePartContext.Provider value={part}>
+        <BubbleHeadContext.Provider value={head}>{children}</BubbleHeadContext.Provider>
+      </BubblePartContext.Provider>
+    </RowPartContext.Provider>
+  );
+}
+
+/** How far under a bubble its cards sit in `bubbles`: one group of the same message, as a run of bubbles. */
+const BUBBLE_JOIN = 3;
 
 /** Anyone else's bubble in `bubbles`: the same, on the left. */
 const OTHER_RUN: Record<RunPosition, { borderTopLeftRadius?: number; borderBottomLeftRadius?: number }> = {
