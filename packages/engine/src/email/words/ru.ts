@@ -616,6 +616,7 @@ export const words: EmailWords = {
       button: "Отвязать",
       small: "Если это были вы, ничего делать не нужно. Отвязать можно в любой момент в Настройках.",
       why: (surface) => `Вы получили это письмо, потому что ${surface} привязан к вашему аккаунту agentes.chat.`,
+      picture: "Ваш ассистент, теперь и в телефоне",
     },
     unlinked: {
       subject: (surface) => `${surface} отвязан от вашего аккаунта agentes.chat`,
@@ -624,6 +625,7 @@ export const words: EmailWords = {
       body: (surface, display) => [{ b: display }, ` в ${surface} отвязан, потому что изменился идентификатор.`],
       small: "Привяжите снова в Настройках, если это были вы.",
       why: (surface) => `Вы получили это письмо, потому что ${surface} был привязан к вашему аккаунту agentes.chat.`,
+      picture: "Ваш ассистент, больше не в телефоне",
     },
   },
 };

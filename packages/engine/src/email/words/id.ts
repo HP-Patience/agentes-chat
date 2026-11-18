@@ -556,6 +556,7 @@ export const words: EmailWords = {
       button: "Putuskan tautan",
       small: "Kalau itu kamu, tidak perlu melakukan apa-apa. Kamu bisa memutuskannya kapan saja di Pengaturan.",
       why: (surface) => `Kamu menerima email ini karena ${surface} ditautkan ke akun agentes.chat kamu.`,
+      picture: "Asistenmu, kini juga di ponselmu",
     },
     unlinked: {
       subject: (surface) => `Tautan ${surface} ke akun agentes.chat kamu diputus`,
@@ -564,6 +565,7 @@ export const words: EmailWords = {
       body: (surface, display) => [{ b: display }, ` di ${surface} diputus tautannya karena identitasnya berubah.`],
       small: "Tautkan lagi di Pengaturan kalau itu kamu.",
       why: (surface) => `Kamu menerima email ini karena ${surface} pernah ditautkan ke akun agentes.chat kamu.`,
+      picture: "Asistenmu, tidak lagi di ponselmu",
     },
   },
 };

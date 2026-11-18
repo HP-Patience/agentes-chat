@@ -585,6 +585,7 @@ export const words: EmailWords = {
       button: "Ontkoppelen",
       small: "Was jij het wel? Dan hoef je niets te doen. Je kunt het altijd ontkoppelen in Instellingen.",
       why: (surface) => `Je krijgt deze e-mail omdat ${surface} aan je agentes.chat-account is gekoppeld.`,
+      picture: "Je assistent, nu ook op je telefoon",
     },
     unlinked: {
       subject: (surface) => `${surface} is ontkoppeld van je agentes.chat-account`,
@@ -593,6 +594,7 @@ export const words: EmailWords = {
       body: (surface, display) => [{ b: display }, ` op ${surface} is ontkoppeld omdat de identiteit is veranderd.`],
       small: "Koppel het opnieuw in Instellingen als jij het was.",
       why: (surface) => `Je krijgt deze e-mail omdat ${surface} aan je agentes.chat-account gekoppeld was.`,
+      picture: "Je assistent, niet meer op je telefoon",
     },
   },
 };

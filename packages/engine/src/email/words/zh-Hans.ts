@@ -497,6 +497,7 @@ export const words: EmailWords = {
       button: "解除关联",
       small: "如果是你本人，无需任何操作。你可以随时在设置中解除关联。",
       why: (surface) => `你收到这封邮件，是因为 ${surface} 关联到了你的 agentes.chat 账号。`,
+      picture: "你的助手，现在也在你的手机上",
     },
     unlinked: {
       subject: (surface) => `${surface} 已与你的 agentes.chat 账号解除关联`,
@@ -505,6 +506,7 @@ export const words: EmailWords = {
       body: (surface, display) => [{ b: display }, `（${surface}）因身份变更已解除关联。`],
       small: "如果是你，请在设置中重新关联。",
       why: (surface) => `你收到这封邮件，是因为 ${surface} 曾关联到你的 agentes.chat 账号。`,
+      picture: "你的助手，已不在你的手机上",
     },
   },
 };

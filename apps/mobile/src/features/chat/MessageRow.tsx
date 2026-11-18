@@ -69,6 +69,7 @@ import Animated, {
   LinearTransition,
   withTiming,
 } from "react-native-reanimated";
+import { serverUrl } from "@/lib/server";
 import { readValueSync, STORED, writeValueSync } from "@/lib/storage";
 import { useOrg } from "@/providers/org";
 import {
@@ -80,6 +81,7 @@ import {
   Icon,
   InkOrbit,
   LineIcon,
+  MarkIcon,
   PressScale,
   ProviderLogo,
   Text,
@@ -97,6 +99,7 @@ import { StretchCard } from "../ai/StretchCard";
 import { UsagePauseCard, UsageWaitCancel } from "../ai/UsagePauseCard";
 import { HandoffCard } from "../browser/HandoffCard";
 import { TrailCard } from "../browser/TrailCard";
+import { iconUri } from "../connectors/logic";
 import { DeviceWait } from "../devices/DeviceWait";
 import { deviceWaitOf } from "../devices/logic";
 import { WaitToolOffAction } from "../devices/ToolOneClick";
@@ -704,7 +707,15 @@ function RowBody({
           hint={t("apps.viaTip", { person: name, name: via.name })}
         />
       ) : null}
-      {surfaceTag ? <Tag icon="chat" label={surfaceTag.label} hint={surfaceTag.hint} wrap /> : null}
+      {surfaceTag ? (
+        <Tag
+          icon="chat"
+          lead={<MarkIcon uri={iconUri(serverUrl(), surfaceTag.mark)} fallback="chat" size={12} color={c.muted} />}
+          label={surfaceTag.label}
+          hint={surfaceTag.hint}
+          wrap
+        />
+      ) : null}
       {routine ? (
         // The tag opens the routine (Rotinas, as on the web); "Ver relatório" beside it unfolds the report.
         <Tag
@@ -1277,11 +1288,11 @@ function Tag({
   );
 }
 
-/** Beside the time of my own message written on the outside chat surface: its glyph, the words read aloud. */
-function SurfaceMark({ tag, color }: { tag: { label: string; hint: string }; color: string }) {
+/** Beside the time of my own message written on the outside chat surface: its logo, the words read aloud. */
+function SurfaceMark({ tag, color }: { tag: { label: string; hint: string; mark: string | null }; color: string }) {
   return (
     <View accessible accessibilityLabel={tag.label} accessibilityHint={tag.hint}>
-      <Icon name="chat" size={12} color={color} />
+      <MarkIcon uri={iconUri(serverUrl(), tag.mark)} fallback="chat" size={12} color={color} />
     </View>
   );
 }

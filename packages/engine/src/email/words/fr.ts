@@ -600,6 +600,7 @@ export const words: EmailWords = {
       button: "Délier",
       small: "Si c'était toi, il n'y a rien à faire. Tu peux le délier à tout moment dans les Paramètres.",
       why: (surface) => `Tu reçois cet e-mail parce que ${surface} a été lié à ton compte agentes.chat.`,
+      picture: "Ton assistant, maintenant aussi sur ton téléphone",
     },
     unlinked: {
       subject: (surface) => `${surface} a été délié de ton compte agentes.chat`,
@@ -608,6 +609,7 @@ export const words: EmailWords = {
       body: (surface, display) => [{ b: display }, ` sur ${surface} a été délié parce que son identité a changé.`],
       small: "Lie-le à nouveau dans les Paramètres si c'était toi.",
       why: (surface) => `Tu reçois cet e-mail parce que ${surface} était lié à ton compte agentes.chat.`,
+      picture: "Ton assistant, plus sur ton téléphone",
     },
   },
 };

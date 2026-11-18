@@ -589,6 +589,7 @@ export const words: EmailWords = {
       small:
         "Wenn du das warst, musst du nichts tun. Du kannst die Verknüpfung jederzeit in den Einstellungen aufheben.",
       why: (surface) => `Du erhältst diese E-Mail, weil ${surface} mit deinem agentes.chat-Konto verknüpft wurde.`,
+      picture: "Dein Assistent, jetzt auch auf deinem Handy",
     },
     unlinked: {
       subject: (surface) => `${surface} wurde von deinem agentes.chat-Konto getrennt`,
@@ -600,6 +601,7 @@ export const words: EmailWords = {
       ],
       small: "Verknüpfe es in den Einstellungen neu, wenn du das warst.",
       why: (surface) => `Du erhältst diese E-Mail, weil ${surface} mit deinem agentes.chat-Konto verknüpft war.`,
+      picture: "Dein Assistent, nicht mehr auf deinem Handy",
     },
   },
 };

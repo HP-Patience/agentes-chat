@@ -2231,6 +2231,7 @@
     "phone": "Telefon",
     "phoneOn": "W aplikacji na telefon, nawet przy zablokowanym ekranie",
     "phoneOff": "Włącz je w aplikacji na telefon",
+    "phoneOpen": "Otwórz",
     "mac": "Aplikacja na Maca",
     "macHelp": "Gdy aplikacja jest otwarta, nawet w tle",
     "on": "Włączone",
@@ -18100,7 +18101,7 @@
         "wallpaper": {
           "title": "Tło",
           "help": "Zmienia się tylko dla ciebie, na wszystkich twoich urządzeniach",
-          "rowHelp": "Za każdą rozmową, tylko dla ciebie. Rozmowa może mieć własne tło w swoim menu.",
+          "rowHelp": "Za każdą rozmową, tylko dla ciebie, chyba że rozmowa ma własne tło ustawione w swoim menu.",
           "rowSub": "Tylko dla ciebie, w każdej rozmowie",
           "onlyHere": "Tylko w {{name}}, tylko dla ciebie",
           "none": "Bez tła",

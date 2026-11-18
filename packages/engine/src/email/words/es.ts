@@ -579,6 +579,7 @@ export const words: EmailWords = {
       button: "Desvincular",
       small: "Si fuiste tú, no tienes que hacer nada. Puedes desvincularlo cuando quieras en Configuración.",
       why: (surface) => `Recibiste este correo porque ${surface} se vinculó a tu cuenta de agentes.chat.`,
+      picture: "Tu asistente, ahora también en tu teléfono",
     },
     unlinked: {
       subject: (surface) => `${surface} se desvinculó de tu cuenta de agentes.chat`,
@@ -587,6 +588,7 @@ export const words: EmailWords = {
       body: (surface, display) => [{ b: display }, ` en ${surface} se desvinculó porque su identidad cambió.`],
       small: "Vincúlalo de nuevo en Configuración si fuiste tú.",
       why: (surface) => `Recibiste este correo porque ${surface} estaba vinculado a tu cuenta de agentes.chat.`,
+      picture: "Tu asistente, ya no en tu teléfono",
     },
   },
 };

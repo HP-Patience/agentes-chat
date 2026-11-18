@@ -542,6 +542,7 @@ export const words: EmailWords = {
       button: "연결 해제",
       small: "본인이라면 아무것도 하지 않아도 됩니다. 언제든 설정에서 연결을 해제할 수 있습니다.",
       why: (surface) => `${surface}이(가) agentes.chat 계정에 연결되어 이 이메일을 보내드립니다.`,
+      picture: "이제 휴대폰에서도 만나는 어시스턴트",
     },
     unlinked: {
       subject: (surface) => `${surface}이(가) agentes.chat 계정에서 연결 해제되었습니다`,
@@ -550,6 +551,7 @@ export const words: EmailWords = {
       body: (surface, display) => [{ b: display }, `(${surface})은(는) 신원이 바뀌어 연결이 해제되었습니다.`],
       small: "본인이라면 설정에서 다시 연결하세요.",
       why: (surface) => `${surface}이(가) agentes.chat 계정에 연결되어 있었기 때문에 이 이메일을 보내드립니다.`,
+      picture: "더 이상 휴대폰에 없는 어시스턴트",
     },
   },
 };

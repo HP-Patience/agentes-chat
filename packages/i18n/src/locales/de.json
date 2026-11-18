@@ -2086,6 +2086,7 @@
     "phone": "Handy",
     "phoneOn": "In der Handy-App, auch bei gesperrtem Handy",
     "phoneOff": "Schalte sie in der Handy-App ein",
+    "phoneOpen": "Öffnen",
     "mac": "Mac-App",
     "macHelp": "Solange die App offen ist, auch im Hintergrund",
     "on": "An",
@@ -16998,7 +16999,7 @@
         "wallpaper": {
           "title": "Hintergrund",
           "help": "Ändert sich nur für dich, auf all deinen Geräten",
-          "rowHelp": "Hinter jeder Unterhaltung, nur für dich. Eine Unterhaltung kann über ihr Menü einen eigenen haben.",
+          "rowHelp": "Hinter jeder Unterhaltung, nur für dich, außer eine Unterhaltung hat über ihr Menü einen eigenen.",
           "rowSub": "Nur für dich, in jeder Unterhaltung",
           "onlyHere": "Nur in {{name}}, nur für dich",
           "none": "Kein Hintergrund",

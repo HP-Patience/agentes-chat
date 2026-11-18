@@ -2159,6 +2159,7 @@
     "phone": "Telefono",
     "phoneOn": "Nell'app per telefono, anche con il telefono bloccato",
     "phoneOff": "Attivale nell'app per telefono",
+    "phoneOpen": "Apri",
     "mac": "App per Mac",
     "macHelp": "Mentre l'app è aperta, anche in background",
     "on": "Attive",
@@ -17555,7 +17556,7 @@
         "wallpaper": {
           "title": "Sfondo",
           "help": "Cambia solo per te, su tutti i tuoi dispositivi",
-          "rowHelp": "Dietro ogni conversazione, solo per te. Una conversazione può averne uno suo dal proprio menu.",
+          "rowHelp": "Dietro ogni conversazione, solo per te, a meno che una conversazione ne abbia uno suo dal proprio menu.",
           "rowSub": "Solo per te, in ogni conversazione",
           "onlyHere": "Solo in {{name}}, solo per te",
           "none": "Nessuno sfondo",

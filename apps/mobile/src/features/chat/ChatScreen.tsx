@@ -133,11 +133,9 @@ import {
   useReanimatedKeyboardAnimation,
 } from "react-native-keyboard-controller";
 import Animated, {
-  Easing,
   FadeIn,
   FadeInDown,
   FadeOut,
-  Keyframe,
   LayoutAnimationConfig,
   useAnimatedRef,
   useAnimatedStyle,
@@ -145,6 +143,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { scheduleOnRN } from "react-native-worklets";
 import { frameClock } from "@/agent/clock";
 import { useStillWhileScrolling } from "@/agent/live";
 import { StickerStageContext } from "@/agent/StickerCanvas";
@@ -164,8 +163,8 @@ import {
   type HeaderAction,
   Icon,
   LineIcon,
-  motion,
   PressScale,
+  RISE_IN,
   type SendHow,
   Text,
   useReducedMotion,
@@ -229,6 +228,7 @@ import { EventLine } from "./EventLine";
 import { FirstDay } from "./FirstDay";
 import { HeaderPill } from "./HeaderPill";
 import { IssueTakenLine } from "./issue-work";
+import { useKeyboardTruth } from "./keyboard-truth";
 import { browsingRuns, WorkingLine } from "./LiveRows";
 import { type LiveTyping, useChatLive, useLiveTyping } from "./live";
 import {
@@ -336,15 +336,11 @@ const DIVIDER_KEY = "unseen-divider";
 const OFFLINE_AFTER_MS = 1200;
 /** "Conectado de novo" stays this long. */
 const BACK_ONLINE_MS = 1600;
-const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
 /**
- * A row that just arrived at the bottom rises 6pt into place (`--dur-base`, as on the web), on the strong ease-out
- * every entrance uses; only while it is fresh: history, a jump and a row scrolled back into view never do.
+ * A row that just arrived at the bottom rises 6pt into place (`RISE_IN`: `--dur-base`, as on the web, on the strong
+ * ease-out every entrance uses); only while it is fresh: history, a jump and a row scrolled back into view never do.
  */
-const ENTER = new Keyframe({
-  0: { opacity: 0, transform: [{ translateY: 6 }] },
-  100: { opacity: 1, transform: [{ translateY: 0 }], easing: EASE_OUT },
-}).duration(motion.base);
+const ENTER = RISE_IN;
 const FRESH_MS = 800;
 /** How close to the end a scroll has to stop for a list held at a long message's start to follow again. */
 const READ_RELEASE_PX = 24;
@@ -359,6 +355,8 @@ const KEYBOARD_GAP = 8;
 const COMPOSER_INPUT_ID = "chat-composer";
 /** How long the conversation is held in place after something opens over it and after it closes (ms). */
 const HOLD_MS = 900;
+/** iOS, where the system's word on the keyboard settles the dock (`useKeyboardTruth`). */
+const IOS = Platform.OS === "ios";
 /** Holding a message opens the system's menu where there is one (iOS); elsewhere, the app's sheet. */
 const NATIVE_MENU = Platform.OS === "ios";
 /**
@@ -2521,36 +2519,25 @@ function Chat({
   // On iOS the keyboard library moves what rides the keyboard (the composer's dock) when a move starts and while
   // the keyboard is dragged, and never when the move ends, while the list takes its room from the start and the
   // end. A last event that wasn't the final state left the box up at the keyboard's height over a list that had
-  // gone back down. The end of every move has the last word for both.
+  // gone back down. The end of every move has the last word for both; then, on iOS, the system's own
+  // (`useKeyboardTruth`: its notifications settle the dock, and a doubt looks at them again a moment later).
   const keyboardAt = useReanimatedKeyboardAnimation();
+  const lookAtKeyboard = useKeyboardTruth(keyboardAt);
   useKeyboardHandler(
     {
       onEnd: (e) => {
         "worklet";
         keyboardAt.height.value = -e.height;
         keyboardAt.progress.value = e.progress;
+        if (IOS) scheduleOnRN(lookAtKeyboard);
       },
     },
-    [],
+    [lookAtKeyboard],
   );
-  // And the system's own word once the keyboard is fully shown or gone: a drag down that let go mid-way could end with
-  // no final move at all, the dock left floating over the conversation with the keyboard gone (seen on a phone). The
-  // system tells JS when the keyboard finished hiding or showing; that settles both. On iOS only: there the system's
-  // height is the library's (the keyboard's frame), while Android's leaves out the navigation bar the library counts
-  // edge to edge, so a late event sank the box that far behind the keys; and there the library ends every move itself.
+  // Back on this screen (a pushed screen or a sheet closed over it): where the keyboard really is.
   useEffect(() => {
-    if (Platform.OS !== "ios") return;
-    const settle = (height: number) => {
-      keyboardAt.height.value = -height;
-      keyboardAt.progress.value = height > 0 ? 1 : 0;
-    };
-    const hide = Keyboard.addListener("keyboardDidHide", () => settle(0));
-    const show = Keyboard.addListener("keyboardDidShow", (e) => settle(e.endCoordinates.height));
-    return () => {
-      hide.remove();
-      show.remove();
-    };
-  }, [keyboardAt]);
+    if (focused) lookAtKeyboard();
+  }, [focused, lookAtKeyboard]);
   // Read while laying out the box: at the conversation's end and following it (not held where the person reads).
   const followingEnd = useRef(true);
   followingEnd.current = atEnd && !readHold;
@@ -2570,6 +2557,7 @@ function Chat({
     // Only what is drawn from it redraws (`DockHeight`); the waiting requests look again at their band's new bottom.
     dock.set(height);
     watchList();
+    lookAtKeyboard();
     // The dock grew under the conversation (who is working, the reply bar, a taller field) while it follows its end.
     // The libraries cover only part of it: the keyboard's scroll view shifts the list by the grown inset only when it
     // rests at its end, and with the keyboard up the list learns the new inset without following it. A message just
@@ -2888,7 +2876,9 @@ function Chat({
     still.settle();
     releaseAtEnd();
     hideDay();
-  }, [releaseAtEnd, hideDay, still]);
+    // Letting go of the list can let go of the keyboard too (dragged down, or back up with no word from the system).
+    lookAtKeyboard();
+  }, [releaseAtEnd, hideDay, still, lookAtKeyboard]);
   const openPinsHere = useLatest(openPins);
   const goToPinHere = useLatest(goToPin);
   // Before the conversation's start: the older pages' row (a spinner while one loads, the way to ask again when one

@@ -14680,8 +14680,9 @@ html:not([data-pointer]) .app-icons__agent:focus-visible {
 /* On a phone the icon, the words and a switch stay on one line while the words keep their 24 characters there (the
    kit's `.ac-actrow` basis), else the switch goes under them, at the row's end: beside both, at 320, a long name would
    wrap a word a line. A chevron stays on its line, its words shrinking (a line that opens something has no ⓘ). Any
-   other control (a choice of several, a select, a field, buttons) goes under the words, from their edge (the 28px icon
-   and the 12px gap), so the rows of one card start their controls on one edge. */
+   other control (a choice of several, a select, a field) goes under the words, from their edge (the 28px icon and the
+   12px gap), so the rows of one card start their controls on one edge. One button stays on the name's line
+   (`.settings-row--button`). */
 @media (max-width: 760px) {
   .settings-row--lead {
     flex-wrap: wrap;
@@ -14744,26 +14745,32 @@ html:not([data-pointer]) .app-icons__agent:focus-visible {
     flex-basis: 100%;
     order: 1;
   }
-  /* A line with a status under its name and a control that is not a switch at its end (a button): the status under
-     the name at the row's full width, the control under the status, from the words' edge. */
-  .settings-row--lead:not(.settings-row--open, :has(> .settings-row__end > .ac-switch)):has(> .settings-row__end)
-  > .settings-row__text:has(> .settings-row__status) {
+  /* A line with a status under its name and a control that is neither a switch nor a button at its end (a select, a
+     choice of several): the status under the name at the row's full width, the control under the status, from the
+     words' edge. A button keeps the name's line (`.settings-row--button`). */
+  .settings-row--lead:not(.settings-row--open, .settings-row--button, :has(> .settings-row__end > .ac-switch)):has(
+    > .settings-row__end
+  ) > .settings-row__text:has(> .settings-row__status) {
     display: contents;
   }
-  .settings-row--lead:not(.settings-row--open, :has(> .settings-row__end > .ac-switch)):has(> .settings-row__end)
+  .settings-row--lead:not(.settings-row--open, .settings-row--button, :has(> .settings-row__end > .ac-switch)):has(
+      > .settings-row__end
+    )
     > .settings-row__text:has(> .settings-row__status)
     > :first-child {
     flex: 1 1 24ch;
     max-width: max-content;
     min-width: 0;
   }
-  .settings-row--lead:not(.settings-row--open, :has(> .settings-row__end > .ac-switch)):has(> .settings-row__end)
+  .settings-row--lead:not(.settings-row--open, .settings-row--button, :has(> .settings-row__end > .ac-switch)):has(
+      > .settings-row__end
+    )
     > .settings-row__text
     > .settings-row__status {
     flex-basis: 100%;
     order: 1;
   }
-  .settings-row--lead:not(.settings-row--open):has(> .settings-row__text > .settings-row__status)
+  .settings-row--lead:not(.settings-row--open, .settings-row--button):has(> .settings-row__text > .settings-row__status)
     > .settings-row__end:not(:has(> .ac-switch)) {
     order: 2;
   }
@@ -14996,6 +15003,43 @@ html:not([data-pointer]) .rh-set__face-edit:focus-visible {
     padding-left: 44px;
     translate: none;
   }
+  /* A button row's state line starts at the name's words: past the icon and this panel's 14px column gap. */
+  .agp-card .settings-row--lead.settings-row--button > .settings-row__text > .settings-row__status {
+    padding-left: calc(28px + 14px);
+  }
+}
+/* A row that ends in one button (PrefRow's `settings-row--button`: Link, Open, Decline), at every width:
+   the button on the name's line at the row's end, centred on that line, never under a sentence. What is true now
+   (`__status`: the linked sender, an error) stays under the name, from the words' edge. The name keeps the room left
+   and wraps whole words: its basis is its longest word, so the button goes under it, still at the end, only when that
+   word and the button can't share the line. */
+.settings-row.settings-row--button {
+  flex-wrap: wrap;
+  row-gap: var(--space-1);
+}
+.settings-row--button > .settings-row__text {
+  display: contents;
+}
+/* The name takes the room before the end's: up to its own length it grows, and the end gets what is left. */
+.settings-row--button > .settings-row__text > :first-child {
+  flex: 1000 1 0;
+  min-width: min-content;
+  max-width: max-content;
+}
+.settings-row--button > .settings-row__text > .settings-row__status {
+  flex-basis: 100%;
+  order: 1;
+}
+.settings-row--lead.settings-row--button > .settings-row__text > .settings-row__status {
+  box-sizing: border-box;
+  padding-left: calc(28px + var(--space-3));
+}
+/* The end takes the line's room left and holds the button at its end: under the name it is the row's width, so the
+   icon never owns a column beside the name's lines and the button's. */
+.settings-row.settings-row--button > .settings-row__end:not(:has(> .ac-switch)) {
+  flex: 1 0 auto;
+  justify-content: flex-end;
+  padding-left: 0;
 }
 /* Wide enough for its placeholder ("Padrão do workspace", longer in es, de, ru) after "US$". */
 .rh-set__budget .ac-input-affix {

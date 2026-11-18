@@ -2015,6 +2015,7 @@
     "phone": "Ponsel",
     "phoneOn": "Di aplikasi ponsel, bahkan saat ponsel terkunci",
     "phoneOff": "Nyalakan di aplikasi ponsel",
+    "phoneOpen": "Buka",
     "mac": "Aplikasi Mac",
     "macHelp": "Selama aplikasi terbuka, bahkan di latar belakang",
     "on": "Aktif",
@@ -16470,7 +16471,7 @@
         "wallpaper": {
           "title": "Latar",
           "help": "Berubah hanya untukmu, di semua perangkatmu",
-          "rowHelp": "Di balik semua percakapan, hanya untukmu. Sebuah percakapan bisa punya latar sendiri lewat menunya.",
+          "rowHelp": "Di balik semua percakapan, hanya untukmu, kecuali percakapan yang punya latar sendiri lewat menunya.",
           "rowSub": "Hanya untukmu, di semua percakapan",
           "onlyHere": "Hanya di {{name}}, hanya untukmu",
           "none": "Tanpa latar",

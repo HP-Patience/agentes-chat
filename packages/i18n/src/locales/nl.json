@@ -2086,6 +2086,7 @@
     "phone": "Telefoon",
     "phoneOn": "In de telefoonapp, ook als je telefoon vergrendeld is",
     "phoneOff": "Zet ze aan in de telefoonapp",
+    "phoneOpen": "Openen",
     "mac": "Mac-app",
     "macHelp": "Zolang de app open is, ook op de achtergrond",
     "on": "Aan",
@@ -17060,7 +17061,7 @@
         "wallpaper": {
           "title": "Achtergrond",
           "help": "Verandert alleen voor jou, op al je apparaten",
-          "rowHelp": "Achter elk gesprek, alleen voor jou. Een gesprek kan via zijn menu een eigen achtergrond hebben.",
+          "rowHelp": "Achter elk gesprek, alleen voor jou, tenzij een gesprek via zijn menu een eigen achtergrond heeft.",
           "rowSub": "Alleen voor jou, in elk gesprek",
           "onlyHere": "Alleen in {{name}}, alleen voor jou",
           "none": "Geen achtergrond",

@@ -566,6 +566,7 @@ export const words: EmailWords = {
       button: "連携を解除",
       small: "ご自身で行った場合は何もする必要はありません。連携はいつでも設定から解除できます。",
       why: (surface) => `${surface} が agentes.chat アカウントに連携されたため、このメールをお送りしています。`,
+      picture: "スマートフォンでも話せるアシスタント",
     },
     unlinked: {
       subject: (surface) => `${surface} と agentes.chat アカウントの連携が解除されました`,
@@ -574,6 +575,7 @@ export const words: EmailWords = {
       body: (surface, display) => [{ b: display }, `（${surface}）は ID が変わったため連携が解除されました。`],
       small: "ご自身なら設定からもう一度連携してください。",
       why: (surface) => `${surface} が agentes.chat アカウントに連携されていたため、このメールをお送りしています。`,
+      picture: "スマートフォンからは外れたアシスタント",
     },
   },
 };

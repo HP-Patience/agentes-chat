@@ -575,6 +575,7 @@ export const words: EmailWords = {
       button: "Scollega",
       small: "Se sei stato tu, non devi fare nulla. Puoi scollegarlo quando vuoi nelle Impostazioni.",
       why: (surface) => `Ricevi questa email perché ${surface} è stato collegato al tuo account agentes.chat.`,
+      picture: "Il tuo assistente, ora anche sul tuo telefono",
     },
     unlinked: {
       subject: (surface) => `${surface} è stato scollegato dal tuo account agentes.chat`,
@@ -586,6 +587,7 @@ export const words: EmailWords = {
       ],
       small: "Collegalo di nuovo nelle Impostazioni se sei stato tu.",
       why: (surface) => `Ricevi questa email perché ${surface} era collegato al tuo account agentes.chat.`,
+      picture: "Il tuo assistente, non più sul tuo telefono",
     },
   },
 };

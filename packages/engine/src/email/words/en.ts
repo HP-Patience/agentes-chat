@@ -609,6 +609,8 @@ export const en = {
       button: "Unlink it",
       small: "If it was you, there's nothing to do. You can unlink it any time in Settings.",
       why: (surface: string) => `You got this email because ${surface} was linked to your agentes.chat account.`,
+      /** The picture's alt text: the assistant beside the phone. */
+      picture: "Your assistant, now on your phone too",
     },
     unlinked: {
       subject: (surface: string) => `${surface} was unlinked from your agentes.chat account`,
@@ -620,6 +622,8 @@ export const en = {
       ],
       small: "Link it again in Settings if it was you.",
       why: (surface: string) => `You got this email because ${surface} was linked to your agentes.chat account.`,
+      /** The picture's alt text: the assistant beside the phone, switched off. */
+      picture: "Your assistant, no longer on your phone",
     },
   },
 };

@@ -2159,6 +2159,7 @@
     "phone": "Téléphone",
     "phoneOn": "Dans l'app mobile, même téléphone verrouillé",
     "phoneOff": "Activez-les dans l'app mobile",
+    "phoneOpen": "Ouvrir",
     "mac": "App Mac",
     "macHelp": "Tant que l'app est ouverte, même en arrière-plan",
     "on": "Activé",
@@ -17541,7 +17542,7 @@
         "wallpaper": {
           "title": "Fond",
           "help": "Ne change que pour vous, sur tous vos appareils",
-          "rowHelp": "Derrière toutes les conversations, pour vous seul. Une conversation peut avoir le sien depuis son menu.",
+          "rowHelp": "Derrière toutes les conversations, pour vous seul, sauf si une conversation a le sien depuis son menu.",
           "rowSub": "Pour vous seul, dans toutes les conversations",
           "onlyHere": "Seulement dans {{name}}, pour vous seul",
           "none": "Aucun fond",

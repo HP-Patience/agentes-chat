@@ -582,6 +582,7 @@ export const words: EmailWords = {
       button: "Bağlantıyı kaldır",
       small: "Sensen yapman gereken bir şey yok. Bağlantıyı istediğin zaman Ayarlar'dan kaldırabilirsin.",
       why: (surface) => `Bu e-postayı ${surface} agentes.chat hesabına bağlandığı için aldın.`,
+      picture: "Asistanın, artık telefonunda da",
     },
     unlinked: {
       subject: (surface) => `${surface} agentes.chat hesabından ayrıldı`,
@@ -590,6 +591,7 @@ export const words: EmailWords = {
       body: (surface, display) => [{ b: display }, ` (${surface}) kimliği değiştiği için ayrıldı.`],
       small: "Sensen Ayarlar'dan yeniden bağla.",
       why: (surface) => `Bu e-postayı ${surface} agentes.chat hesabına bağlı olduğu için aldın.`,
+      picture: "Asistanın, artık telefonunda değil",
     },
   },
 };

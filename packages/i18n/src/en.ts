@@ -2244,6 +2244,7 @@ export const en = {
     phone: "Phone",
     phoneOn: "In the phone app, even with the phone locked",
     phoneOff: "Turn them on in the phone app",
+    phoneOpen: "Open",
     mac: "Mac app",
     macHelp: "While the app is open, even in the background",
     on: "On",
@@ -2603,7 +2604,10 @@ export const en = {
     row: {
       hint: "Talk with {{assistant}} and get its replies on {{surface}}.",
       link: "Link",
-      /** Under the app's name while nothing is linked. {{assistant}} is the workspace's built-in assistant by name. */
+      /**
+       * Behind the ⓘ beside the app's name while nothing is linked. {{assistant}} is the workspace's built-in assistant
+       * by name.
+       */
       none: "{{assistant}} can message you there",
       pending: "A sender is waiting for you to confirm",
       unlink: "Unlink",
@@ -17392,7 +17396,7 @@ export const en = {
         wallpaper: {
           title: "Background",
           help: "Changes only for you, on all your devices",
-          rowHelp: "Behind every conversation, only for you. A conversation can have its own from its menu.",
+          rowHelp: "Behind every conversation, only for you, unless a conversation has its own from its menu.",
           rowSub: "Only for you, in every conversation",
           onlyHere: "Only in {{name}}, only for you",
           none: "No background",
