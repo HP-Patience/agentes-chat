@@ -9,6 +9,7 @@ import {
   eq,
   gt,
   inArray,
+  isNotNull,
   isNull,
   ne,
   not,
@@ -1575,6 +1576,21 @@ export async function deleteAccount(
       });
       if (outsideOf) await recordOperatorEvent(tx, { type: "outside_access.ended", orgId: org.id, data: { userId } });
     }
+    // Their outside requests not yet told as over go with the account (the rows cascade): the operator hears it once.
+    const outsideAsks = await tx
+      .select({ orgId: organizationJoinRequests.orgId })
+      .from(organizationJoinRequests)
+      .where(
+        and(
+          eq(organizationJoinRequests.userId, userId),
+          eq(organizationJoinRequests.status, "pending"),
+          isNotNull(organizationJoinRequests.outsideOf),
+        ),
+      );
+    await recordOperatorEvent(
+      tx,
+      ...outsideAsks.map((r) => ({ type: "outside_access.ended" as const, orgId: r.orgId, data: { userId } })),
+    );
     const removed = [];
     for (const computer of plan.computers) {
       const freed = await detachMachine(tx, { ...computer, kind: "connected" });

@@ -19,7 +19,9 @@ import {
   type DeletionDeps,
   deriveSecret,
   getOrganization,
+  HOST_LOGO_PATH,
   hasPassword,
+  hostLook,
   INVITE_CHOICES_MAX,
   invitationLogoFile,
   invitationState,
@@ -65,6 +67,7 @@ import {
   setWallpaperPhoto,
   signInOptions,
   soleOwnerRefusal,
+  surfaceOn,
   toldReason,
   USER_LOCALES,
   undoEmailChange,
@@ -112,6 +115,7 @@ import {
   json,
   noContent,
   OrgParams,
+  requestBaseUrl,
   requireSession,
   security,
 } from "./context";
@@ -402,6 +406,24 @@ export function accountRoutes(deps: AppDeps) {
                 description:
                   "The same for the phone app (`SENTRY_MOBILE_DSN`, else `SENTRY_WEB_DSN`); `release` is the server's, the app files its reports under its own.",
               }),
+            surface: z.boolean().openapi({
+              description:
+                "An outside chat surface is bridged (`SURFACE_BRIDGE_TOKEN`, ADR 0187). Whether this account may link it is `GET /api/app/me/surface-links`'s `allowed`.",
+            }),
+            host: z
+              .object({
+                name: z.string(),
+                accent: z.string().nullable().openapi({ description: "`#rrggbb`; null: the default." }),
+                logoUrl: z
+                  .string()
+                  .nullable()
+                  .openapi({ description: "Its logo (`GET /api/host-look/logo`); null: none." }),
+              })
+              .nullable()
+              .openapi({
+                description:
+                  "This request's host is one the server's operator registered (ADR 0194): the pages before sign-in show its look, and sign-in is by email alone (`socialProviders` all off). Null on any other host.",
+              }),
           }),
         ),
       },
@@ -412,9 +434,10 @@ export function accountRoutes(deps: AppDeps) {
       const ownerWaits = users === 0 && signupPolicy(config).ownerByLink;
       const reportsTo = (dsn: string | undefined) =>
         dsn ? { dsn, environment: config.SENTRY_ENVIRONMENT, release: releaseOf(config) } : null;
+      const look = await hostLook(db, c.req.header("host"));
       return c.json(
         {
-          ...authUiConfig(config),
+          ...authUiConfig(config, Boolean(look)),
           signupOpen: await signupOpen(db, config, users),
           firstRun: users === 0 && !ownerWaits,
           ownerClaim: users === 0 && Boolean(config.OWNER_CLAIM_SHA256),
@@ -426,6 +449,12 @@ export function accountRoutes(deps: AppDeps) {
           turnstileSiteKey: deps.adapters.humanCheck?.siteKey ?? null,
           errorReports: reportsTo(config.SENTRY_WEB_DSN),
           mobileErrorReports: reportsTo(config.SENTRY_MOBILE_DSN ?? config.SENTRY_WEB_DSN),
+          surface: surfaceOn() !== null,
+          host: look && {
+            name: look.name,
+            accent: look.accent,
+            logoUrl: look.logo ? `${HOST_LOGO_PATH}?v=${look.logo.split("/").pop()}` : null,
+          },
         },
         200,
       );
@@ -481,6 +510,7 @@ export function accountRoutes(deps: AppDeps) {
       if (!limit.allowed) return apiError(c, 429, "rate_limited", "Too many requests. Try again later.");
       const refused = await humanCheckRefusal(
         deps.adapters.humanCheck,
+        db,
         c.req.raw.headers,
         "email-lookup",
         config.TRUSTED_PROXIES,
@@ -967,10 +997,21 @@ export function accountRoutes(deps: AppDeps) {
             leaves: z
               .array(z.object({ id: z.uuid(), name: z.string(), role: Role }))
               .openapi({ description: "Workspaces with others in them, which they leave." }),
-            soleOwner: z.array(z.object({ id: z.uuid(), name: z.string() })).openapi({
-              description:
-                "Workspaces they are the only owner of, with others in them and not being deleted: make someone else an owner, or delete the workspace, first (`sole_owner`).",
-            }),
+            soleOwner: z
+              .array(
+                z.object({
+                  id: z.uuid(),
+                  name: z.string(),
+                  onlyOutside: z.boolean().openapi({
+                    description:
+                      "Everyone else in it is an outside collaborator, who can't be an owner: invite a member and make them an owner first.",
+                  }),
+                }),
+              )
+              .openapi({
+                description:
+                  "Workspaces they are the only owner of, with others in them and not being deleted: make someone else an owner, or delete the workspace, first (`sole_owner`, with `params.onlyOutside` when every one has only outside collaborators besides them).",
+              }),
             computers: z.array(z.object({ orgId: z.uuid(), id: z.uuid(), name: z.string() })).openapi({
               description:
                 "Computers they connected in the workspaces they leave, not in system mode: removed with the account.",
@@ -1864,7 +1905,7 @@ export function accountRoutes(deps: AppDeps) {
         ...c.req.valid("json"),
         secret: config.AGENTES_SECRET,
       });
-      const url = `${config.PUBLIC_URL.replace(/\/$/, "")}/invite/${token}`;
+      const url = `${await requestBaseUrl(deps, c.req.raw.headers)}/invite/${token}`;
       await queueInvitationEmail(db, {
         orgId: invitation.orgId,
         invitationId: invitation.id,

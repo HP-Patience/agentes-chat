@@ -647,6 +647,8 @@ export const en = {
     termsMiddle: " and the ",
     privacy: "Privacy policy",
     termsAfter: ".",
+    // Under the sign-in on a registered host (ADR 0194): "agentes.chat" is the product's name, never translated.
+    poweredBy: "Powered by agentes.chat",
     signOut: "Sign out",
     earlyAccess: {
       otherEmail: "This invitation is for another address. Sign up with the address it was sent to.",
@@ -2562,6 +2564,73 @@ export const en = {
       "In the agentes.chat app on that computer, turn on Reach it from your phone and teammates in Preferences › Servers. Then come back here.",
     localOnlyHere: "Turn on Reach it from your phone and teammates. Then come back here.",
   },
+  /** An outside chat app linked to a person's account (ADR 0187). {{surface}} is that app's name, as the server sets it. */
+  surface: {
+    link: {
+      /**
+       * The words are a recorded consent: a change of meaning needs a new key, never an edit. {{assistant}} is the
+       * workspace's built-in assistant by name. "stop" stays in English in every language: the chat app's service
+       * recognises it (and "parar" in Portuguese).
+       */
+      consent:
+        "{{assistant}} by agentes.chat may message you on {{surface}} about your workspaces, and call you only when something is urgent and you allow it. Write stop to turn this off.",
+      /** The link dialog's title. {{assistant}} is the workspace's built-in assistant by name. */
+      title: "Talk to {{assistant}} on {{surface}}",
+      qr: "QR code that opens {{surface}} with your code typed in",
+      making: "Making your code",
+      /** Under the QR code: the code itself, for typing it by hand. */
+      code: "Your code {{code}}",
+      open: "Open {{surface}}",
+      stepScan: "Scan the code with your phone, or open the app",
+      stepSend: "Send the message as it is",
+      stepSendText: "This moves on by itself once your message arrives.",
+      stepConfirm: "Check the sender and confirm here",
+      showCode: "Show the code again",
+      confirmTitle: "Is this your {{surface}}?",
+      sentBy: "This sender sent your code",
+      /** Under the sender: the one line that says to stop before linking someone else's sender. */
+      onlyYou: "Link it only if this is you.",
+      /** The workspace whose assistant answers on the chat app. */
+      workspace: "Answers in {{workspace}}",
+      confirm: "Yes, link it",
+      notMe: "Not me",
+      doneTitle: "{{surface}} is linked",
+      doneText: "{{assistant}} answers you there from now on.",
+      newCode: "Make a new code",
+      done: "Done",
+    },
+    /** Settings › Notifications › Where they arrive: the chat app's row. */
+    row: {
+      hint: "Talk with {{assistant}} and get its replies on {{surface}}.",
+      link: "Link",
+      /** Under the app's name while nothing is linked. {{assistant}} is the workspace's built-in assistant by name. */
+      none: "{{assistant}} can message you there",
+      pending: "A sender is waiting for you to confirm",
+      unlink: "Unlink",
+      unlinkTitle: "Unlink {{surface}}?",
+      unlinkText: "{{assistant}} stops answering you there. You can link it again any time.",
+      unlinked: "{{surface}} unlinked",
+    },
+    /** The page the "linked" email's undo opens. Signed out, so it learns the app's name only from the answer. */
+    undo: {
+      title: "Unlink the chat app?",
+      lead: "Your account was just linked to a chat app. If that wasn't you, unlink it here.",
+      button: "Unlink",
+      done: "{{surface}} unlinked",
+      doneLead: "{{display}} can't reach your account anymore.",
+      ended: "Already unlinked",
+      endedLead: "{{display}} on {{surface}} was unlinked before. Nothing else to do.",
+      gone: "This undo link no longer works",
+      /** In place of the sender's name when the server has none. */
+      sender: "That sender",
+    },
+    /** The tag on a person's message written in the chat app. */
+    via: "via {{surface}}",
+    viaTip: "Sent by {{person}} on {{surface}}",
+    /** The same, for a message the person forwarded there: someone else's words. */
+    forwarded: "forwarded via {{surface}}",
+    forwardedTip: "{{person}} forwarded this from {{surface}}. The words are someone else's.",
+  },
   team: {
     title: "Team",
     people_one: "{{count}} person",
@@ -3675,9 +3744,18 @@ export const en = {
     /** What the person already has, before the new sign-ins: accounts on the agent's computer, the workspace's keys. */
     have: {
       title: "Already connected",
-      titleFor: "Already connected, for {{name}}",
       other: "Or connect another",
       manageKeys: "Manage or delete keys",
+      /** Over the accounts already connected: what picking one does. */
+      pickLine: "Pick an account already connected here. {{name}} thinks with it.",
+      /** Under a person's group: their accounts the viewer can't pick (not lent, or signed out), counted per account. */
+      onlyOwner_one: "{{count}} more of {{name}}'s accounts only {{name}} can give.",
+      onlyOwner_other: "{{count}} more of {{name}}'s accounts only {{name}} can give.",
+      /** After the email of one's own account made for all agents: how many other agents think with it. */
+      moreAgents_one: "and {{count}} more agent",
+      moreAgents_other: "and {{count}} more agents",
+      /** Someone else's plan, with room left (their row has no meter word otherwise). */
+      plenty: "Plenty left",
     },
     /** Connect opened from an agent's conversation (ADR 0160, addendum): what is already connected, to pick from. */
     chat: {
@@ -4125,7 +4203,6 @@ export const en = {
       aiAccount: "Thinks with {{account}}",
       aiModel: "Thinks through the API",
       aiNone: "No AI yet. Connect one after creating it",
-      reviewTitle: "Review {{name}}",
       lines: "What {{name}} gets",
       aChannel: "a channel",
       anApp: "an app",
@@ -7601,7 +7678,6 @@ export const en = {
     adminsOnlyPersonal: "Ask whoever runs this space to let you create agents.",
     proposalClosed: "This proposal was already decided or expired.",
     proposalNoAccess: "Only people in its conversation can see this proposal.",
-    backToChat: "Back to the conversation",
     and: " and ",
     routine: "Routine",
     routineKeep: "Create the routine {{name}}",
@@ -7779,6 +7855,55 @@ export const en = {
     otherSkill: "Another skill",
     namesLead: "How about",
     namesRoll: "Other names",
+    /**
+     * "Edit first" on an agent's proposal: the card filled in with the draft, and in the list's place the proposal
+     * (who proposed it and why, what the person changed, the first task, what is left for after it is created).
+     */
+    proposal: {
+      lead: "Adjust what {{name}} proposed. You can change everything later.",
+      leadNarrow: "{{name}}'s proposal: {{why}}",
+      side: "The proposal",
+      from: "Proposed by {{name}}",
+      changed: "What you changed",
+      changedNone: "Nothing yet. What you change on the card shows here, with Undo.",
+      undo: "Undo",
+      changes: {
+        changed: "changed",
+        added: "added",
+        removed: "removed",
+        how: "How it works",
+      },
+      firstTask: "First task",
+      firstTaskPlaceholder: "What to ask first (optional)",
+      firstTaskHint: "Ready in your chat with {{name}}. Just send it.",
+      firstTaskHintBlank: "Ready in your chat with it. Just send it.",
+      firstTaskNone: "With no task, the chat opens empty.",
+      after: "After it's created",
+      afterAi: "Connect an AI for {{name}} to think with",
+      afterAiBlank: "Connect an AI for it to think with",
+      afterApp: "Connect {{app}}",
+      afterNone: "Nothing. {{name}} starts working as soon as it's created.",
+      afterNoneBlank: "Nothing. It starts working as soon as it's created.",
+      discard: "Discard proposal",
+      otherChannel: "Another channel",
+      chooseChannels: "Choose channels",
+      channelsNone: "Only in its chat with you.",
+      channel: {
+        lead: "Where {{name}} will work.",
+        leadBlank: "Where it will work.",
+        does: "{{name}} answers when called in {{channel}} and reads what goes on there.",
+        doesBlank: "It answers when called in {{channel}} and reads what goes on there.",
+        remove: "Remove from {{channel}}",
+      },
+      routine: {
+        label: "Routine",
+        lead: "{{when}}, in {{channel}}.",
+        leadDm: "{{when}}, in its chat with you.",
+        starts: "Starts once {{name}} is created. Change its time and text in Routines.",
+        startsBlank: "Starts once it's created. Change its time and text in Routines.",
+        remove: "Remove the routine",
+      },
+    },
     /** One skill on the card. */
     skill: {
       opens: "{{name}} opens this manual when the topic comes up. You edit it in Skills.",
@@ -15138,6 +15263,18 @@ export const en = {
     },
   },
   errors: {
+    /** Linking an outside chat app (ADR 0187). The server's refusals carry no app name, so none is said. */
+    surface: {
+      off: "Linking chat apps was turned off. Reload to see your settings as they are now.",
+      notAllowed: "Linking a chat app isn't open to your account yet. Keep using the app here until it opens.",
+      noAssistant: "The assistant in this workspace isn't set to talk with you. Pick another workspace to link.",
+      noWorkspace: "You're no longer in this workspace. Pick another workspace to link.",
+      linkGone:
+        "This link isn't waiting anymore: it ran out after 10 minutes or was canceled. Make a new code to start again.",
+      taken: "That sender is linked to another agentes.chat account. Unlink it there, then send a new code.",
+      undoGone: "This undo link was already used or ran out. Unlink in your notification settings instead.",
+      codeGone: "This code is wrong, used or ran out after 10 minutes. Make a new code and send it again.",
+    },
     wallpaper: {
       notYours: "That photo isn't yours.",
       invalid: "That background doesn't exist.",
@@ -15178,7 +15315,8 @@ export const en = {
       accountInUse: "That account already thinks for another agent.",
       noAiYet: "There's still no AI connected.",
       filePurged: "This file was deleted more than 30 days ago and can't come back.",
-      looksSecret: "That looks like a password or a key, and everyone here would see it.",
+      looksSecret:
+        "That looks like a password or a key, and everyone here would see it. Ask the agent to request it privately instead.",
       blockSpec: "This block has a mistake in its parts or formulas, so it can't be shown. Fix it and try again.",
       takeControl: "Take control of the profile first.",
       profileBusy: "Someone else is using this profile.",
@@ -15199,6 +15337,9 @@ export const en = {
       neverHappens: "This schedule never happens.",
       soleOwner:
         "You're the only owner of a workspace with other members. Make someone else an owner, or delete the workspace, first.",
+      /** The same, when everyone else there is an outside collaborator, who can't be an owner (ADR 0191). */
+      soleOwnerOutside:
+        "You're the only owner of a workspace whose other people are outside collaborators, who can't be owners. Invite a member and make them an owner, or delete the workspace, first.",
       testFirst: "Test the connection with these settings before turning it on.",
       voiceLength: "The recording is too long or too short.",
       sendAgain: "The file didn't arrive whole. Send it again.",
@@ -15328,6 +15469,8 @@ export const en = {
       answered: "Someone already answered this request.",
       expired: "This request expired: nobody answered it in 14 days.",
       codeNeeded: "Verify your email first.",
+      /** Approving an outside collaborator's request (ADR 0191) whose account was blocked or is being deleted. */
+      outsideClosed: "This account was blocked or is being deleted, so it can't join. The request is closed.",
     },
     /** An emailed code refused: asking to join (ADR 0072) and deleting (ADR 0088) alike. */
     code: {
@@ -16914,6 +17057,37 @@ export const en = {
     },
     system: "System",
     removed: "Removed",
+    /** Whoever runs the server read one piece of what the workspace wrote. The row's sentence, then why under it. */
+    operatorRead: {
+      /** `who`: one of `who.*`. `what`: one of `what.*`, written to follow "read". */
+      sentence: "{{who}} read {{what}}",
+      who: {
+        server: "Whoever runs this server",
+        cloud: "agentes.chat support",
+      },
+      what: {
+        message: "a message",
+        run_step: "a step of an agent's work",
+        agent: "an agent's instructions",
+        routine: "a routine",
+        task: "a background task",
+        channel: "a channel's name",
+        connection: "a connection's details",
+        support_request: "a support request",
+        direct: "something in a private conversation",
+        other: "something in the workspace",
+      },
+      /** Under the sentence, and after "Reason:" in the entry's panel. `name`: the member who asked for help. */
+      request: {
+        plain: "at {{name}}'s request",
+        app: "at {{name}}'s request, sent from the app",
+        email: "at {{name}}'s request, sent by email",
+        operator: "at {{name}}'s request, recorded by whoever runs this server",
+        support: "at {{name}}'s request, recorded by support",
+      },
+      fault: "to diagnose a failed or stuck run",
+      ai: "with an AI assistant",
+    },
     change: {
       mergedWithoutAsking: "Merged in {{repo}} without asking",
       accentChanged: "Changed the workspace's accent color",
@@ -18555,6 +18729,11 @@ export const en = {
       file_saved: "File saved.",
       issue_work_start: "Please do task #{{number}}.",
       issue_taken: "Took task #{{number}}.",
+      /** An outside chat surface (ADR 0187) unlinked the account on its own; the surface no longer reaches them. */
+      surfaceUnlinked:
+        "{{surface}} was unlinked because its identity changed. Link it again in Settings if it was you.",
+      /** A voice note sent from an outside chat surface had no words to post; the line goes back out there. */
+      surfaceVoiceDropped: "I couldn't make out that voice note. Could you send it again, or type it?",
       done: "Done.",
       stretch_paused_runs_one: "{{agents}} paused to check with you before going on",
       stretch_paused_runs_other: "{{agents}} paused to check with you before going on",
@@ -19483,6 +19662,9 @@ export const en = {
     serverOwner: "You set up this server. Its own settings will have no owner here, only in its environment.",
     blockers: "Before you can delete it",
     soleOwner: "You're the only owner of {{name}}. Make someone else an owner, or delete {{name}}.",
+    /** Everyone else in it is an outside collaborator, who can't be an owner (ADR 0191). */
+    soleOwnerOutside:
+      "You're the only owner of {{name}}, and its other people are outside collaborators, who can't be owners. Invite a member and make them an owner, or delete {{name}}.",
     /** The same, for a workspace still in its onboarding: it has no People page yet. */
     soleOwnerSettingUp:
       "You're the only owner of {{name}}. Finish setting it up to make someone else an owner, or delete {{name}}.",

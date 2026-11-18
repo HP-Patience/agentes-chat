@@ -118,18 +118,6 @@ p {
 .ai-picker .ac-option__title {
   font-size: 14px;
 }
-/* A row's two lines: its check sits on the first, its name's (the padding, then half the line). */
-.ai-picker > .ac-option.ai-picker__key::after {
-  /* Browsers without the lh unit: the page's 22px line. */
-  top: calc(var(--space-3) + 11px - 9px);
-}
-/* Behind @supports: a declaration holding var() parses even where lh is unknown, so as a second `top` it would
-   replace the fallback there and then compute to auto. */
-@supports (top: 1lh) {
-  .ai-picker > .ac-option.ai-picker__key::after {
-    top: calc(var(--space-3) + 0.5lh - 9px);
-  }
-}
 /* What the person already has: its rows a list, and its line sits on them as a label on its field. */
 .ai-picker > .ac-option + .ac-option {
   margin-top: calc(var(--space-2) - var(--form-gap));
@@ -8527,6 +8515,45 @@ html:not([data-pointer]) .izoom__stage:focus-visible {
 .phone-code .machine-pair__steps {
   align-self: stretch;
 }
+/* Linking an outside chat app (ADR 0187): the QR code, the code and its time, the steps, the way to open the app.
+   The sender's name and display are the surface's untrusted words: they wrap anywhere, never cut. */
+.surface-link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.surface-link .dv-steps {
+  align-self: stretch;
+}
+.surface-link__code {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.surface-link__text {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.surface-sender {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 0 0 1px var(--line);
+  min-width: 0;
+}
+.surface-sender__display {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.surface-sender__line {
+  overflow-wrap: anywhere;
+}
 /* A step's words, then the stores under them, on the same left edge. */
 .phone-code__step {
   display: flex;
@@ -14716,6 +14743,29 @@ html:not([data-pointer]) .app-icons__agent:focus-visible {
     > .settings-row__status {
     flex-basis: 100%;
     order: 1;
+  }
+  /* A line with a status under its name and a control that is not a switch at its end (a button): the status under
+     the name at the row's full width, the control under the status, from the words' edge. */
+  .settings-row--lead:not(.settings-row--open, :has(> .settings-row__end > .ac-switch)):has(> .settings-row__end)
+  > .settings-row__text:has(> .settings-row__status) {
+    display: contents;
+  }
+  .settings-row--lead:not(.settings-row--open, :has(> .settings-row__end > .ac-switch)):has(> .settings-row__end)
+    > .settings-row__text:has(> .settings-row__status)
+    > :first-child {
+    flex: 1 1 24ch;
+    max-width: max-content;
+    min-width: 0;
+  }
+  .settings-row--lead:not(.settings-row--open, :has(> .settings-row__end > .ac-switch)):has(> .settings-row__end)
+    > .settings-row__text
+    > .settings-row__status {
+    flex-basis: 100%;
+    order: 1;
+  }
+  .settings-row--lead:not(.settings-row--open):has(> .settings-row__text > .settings-row__status)
+    > .settings-row__end:not(:has(> .ac-switch)) {
+    order: 2;
   }
   /* A line that opens something, with a status: the icon, the name and the chevron (a value before it) on one line,
      the status under them at the row's width, so the icon never owns a column beside three lines. */

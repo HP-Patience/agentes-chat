@@ -192,6 +192,13 @@ export type EmailTemplate =
    */
   | { kind: "email_changed"; locale: EmailLocale; email: string; newEmail: string; url: string }
   /**
+   * An outside chat surface was linked to the account (ADR 0187): `display` is how the surface shows the sender, `url`
+   * the undo page that unlinks it, for 7 days.
+   */
+  | { kind: "surface_linked"; locale: EmailLocale; surface: string; display: string; orgName: string; url: string }
+  /** The surface unlinked the account because the sender's identity there changed. `url`: the server, for the pictures. */
+  | { kind: "surface_unlinked"; locale: EmailLocale; surface: string; display: string; url: string }
+  /**
    * Double opt-in for the landing page's waiting list, in the language they
    * joined in. `email` is the address being confirmed (absent in jobs queued
    * before it existed).
@@ -846,6 +853,32 @@ function docOf(t: EmailTemplate, sender: string | null): EmailDoc {
           fallback(t.url),
         ],
         c.why,
+      );
+    }
+    case "surface_linked": {
+      const c = w.surface.linked;
+      return doc(
+        c.subject(t.surface),
+        c.preheader,
+        c.headline(t.surface),
+        [
+          { p: c.body(t.surface, inertText(t.display), inertText(t.orgName)) },
+          { note: c.notYou },
+          { button: c.button, url: t.url },
+          { small: c.small },
+          fallback(t.url),
+        ],
+        c.why(t.surface),
+      );
+    }
+    case "surface_unlinked": {
+      const c = w.surface.unlinked;
+      return doc(
+        c.subject(t.surface),
+        c.preheader,
+        c.headline(t.surface),
+        [{ p: c.body(t.surface, inertText(t.display)) }, { small: c.small }],
+        c.why(t.surface),
       );
     }
     case "autonomy_report": {

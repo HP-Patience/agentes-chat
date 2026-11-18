@@ -1974,7 +1974,7 @@ test("a computer in standby: the run asks it to wake and waits quietly however l
   expect((run?.transcript as { waitingForBrain?: unknown } | undefined)?.waitingForBrain).toBeUndefined();
 });
 
-test("still asleep after the wake's wait: the note and the wait for the computer, as for any computer away", async () => {
+test("still asleep after the wake's wait: quiet for the outage grace, then the note, as for any computer away", async () => {
   f = await setup();
   const machineId = await computerAgent(f);
   await f.db.update(schema.providerCredentials).set({ revokedAt: new Date() });
@@ -1989,15 +1989,42 @@ test("still asleep after the wake's wait: the note and the wait for the computer
   });
   await post(f, "@dev oi");
   await drainOutbox(f.db, handlers);
-  const [run] = await f.db.select().from(schema.agentRuns);
+  let [run] = await f.db.select().from(schema.agentRuns);
   expect(run?.status).toBe("waiting_input");
   expect(run?.waitingMachineId).toBe(machineId);
   expect(seen.length).toBe(0);
   expect(sleeping.woke).toEqual([`${machineId}:run`]);
+  // Waking may take a moment: nothing said yet.
+  expect((await timeline(f)).map((m) => m.body)).toEqual(["@dev oi"]);
+
+  // Still asleep past the grace since its first wait: it is down, and says so.
+  const since = (run?.transcript as { standbyWaitSince?: number } | undefined)?.standbyWaitSince ?? 0;
+  expect(since).toBeGreaterThan(0);
+  await f.db
+    .update(schema.agentRuns)
+    .set({ transcript: { ...(run?.transcript as object), standbyWaitSince: since - 3 * 60_000 } })
+    .where(eq(schema.agentRuns.id, run?.id ?? ""));
+  await drainOutbox(f.db, handlers, { now: new Date(Date.now() + 3 * 60_000) });
+  [run] = await f.db.select().from(schema.agentRuns);
+  expect(run?.status).toBe("waiting_input");
   expect((await timeline(f)).at(-1)?.meta).toMatchObject({
     bodyCode: "brain_unavailable",
     brainUnavailable: { code: "machine_offline", machineId },
   });
+
+  // It wakes after all: the run answers, and a later sleep's quiet wait starts its own clock.
+  const awake = createJobHandlers({
+    ...f.jobDeps,
+    computerBlipWaitMs: 10,
+    computerWakeWaitMs: 10_000,
+    brains: { claude_code: () => brain },
+    machines: sleepingComputer(true).machines,
+  });
+  await resumeRunsWaitingForMachine(f.db, machineId);
+  await drainOutbox(f.db, awake);
+  [run] = await f.db.select().from(schema.agentRuns);
+  expect(run?.status).toBe("done");
+  expect((run?.transcript as { standbyWaitSince?: number } | undefined)?.standbyWaitSince).toBeUndefined();
 });
 
 test("a run back from another wait finds its computer fallen asleep: it asks it to wake and waits again", async () => {

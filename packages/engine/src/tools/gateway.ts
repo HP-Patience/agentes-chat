@@ -59,6 +59,7 @@ import { keysOfCall, RUN_CODE_TOOL, routineKeysAllowed, routineKeysKind } from "
 import { addRunStep } from "../runs";
 import { describeWhen } from "../schedule";
 import { REQUEST_SECRET_TOOL } from "../secrets";
+import { surfaceRefusal } from "../surfaces/turn";
 import {
   callTargets,
   checkTeamAction,
@@ -1433,6 +1434,13 @@ export function createToolGateway(deps: {
         if (actions?.length && actions.every(opensPullRequestName)) tool = { ...tool, opensPullRequest: true };
       }
       if (tool.sensitive && tool.asksNobody?.(call.input)) tool = { ...tool, sensitive: false };
+      const surfaceNo = await surfaceRefusal(ctx, tool, call.input);
+      if (surfaceNo) {
+        return finish(
+          { content: surfaceNo, isError: true, data: { code: "tool.surface", refusal: "surface" } },
+          "refused",
+        );
+      }
       const builtIn = isBuiltIn(tool);
       const decides = level === "risky" && (await creatorDecides(ctx, authority));
       // A call that only looks is judged as at the default level: an agent that always asks asks for changes.
